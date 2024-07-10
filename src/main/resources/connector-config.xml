@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<GenericConnector sdkApiVersion="1.2.25">
+    <connectorClassName>com.boomi.connector.kafka.KafkaConnector</connectorClassName>
+</GenericConnector>

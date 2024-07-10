@@ -1,0 +1,479 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenericConnectorDescriptor requireConnectionForBrowse="true" browsingType="any">
+    <description>Apache Kafka Connector</description>
+
+    <field id="username" label="Username/Client Principal" type="string">
+        <helpText>
+            The username to log into the Kafka account. When using a non-SASL protocol, leave this field empty.
+            When using Kerberos (GSSAPI) to authenticate, the Client Principal is a unique identity for a user who can
+            access the Kerberos account and is typically divided into three parts (the primary, the instance, and realm)
+            in this format: primary/instance@REALM. For example, kafka-client/myHost@KAFKA_REALM.
+        </helpText>
+    </field>
+
+    <field id="password" label="Password" type="password">
+        <helpText>
+            The password used to log into the Kafka account. Leave this field empty if you are using a non-SASL
+            protocol.
+        </helpText>
+    </field>
+
+    <field type="string" id="avro.mode" label="Avro mode">
+        <helpText>Choose if you want only avro message or avro key and message.</helpText>
+        <defaultValue>No avro</defaultValue>
+        <allowedValue label="No avro">
+            <value>no.avro</value>
+        </allowedValue>
+        <allowedValue label="Avro message">
+            <value>only.message</value>
+        </allowedValue>
+        <allowedValue label="Avro key and message">
+            <value>key.and.message</value>
+        </allowedValue>
+    </field>
+
+    <field id="bootstrap_servers" label="Broker List" type="string">
+        <helpText>
+            Enter a list of host and port pairs, separated by commas.
+        </helpText>
+    </field>
+
+    <field id="service_principal" label="Service Name/Principal" type="string">
+        <helpText>
+            A unique identifier for the service instance accessing the Kerberos account. The instance is typically
+            divided into three components (the service, a fully-qualified host name, and realm) in this format: service
+            part/hostname@REALM. For example, kafka/myHost@KAFKA_REALM. You can specify the complete service principal,
+            or enter only the service name. In this case, the connector determines the remaining components using the
+            host's fully-qualified domain name (FQDN) and realm specified in the Client Principal. Leave this field
+            empty when using a SASL mechanism other than Kerberos.
+        </helpText>
+    </field>
+
+    <field id="consumer_group" label="Consumer Group" type="string">
+        <helpText>
+            Enter the unique string that identifies the consumer group which the connector belongs to.
+        </helpText>
+    </field>
+
+    <field id="security_protocol" label="Security Protocol" type="string">
+        <helpText>
+            Select the appropriate security protocol to connect to the Kafka account.
+        </helpText>
+        <defaultValue>PLAINTEXT</defaultValue>
+        <allowedValue label="PLAINTEXT">
+            <value>PLAINTEXT</value>
+        </allowedValue>
+        <allowedValue label="SSL">
+            <value>SSL</value>
+        </allowedValue>
+        <allowedValue label="SASL PLAINTEXT">
+            <value>SASL_PLAINTEXT</value>
+        </allowedValue>
+        <allowedValue label="SASL SSL">
+            <value>SASL_SSL</value>
+        </allowedValue>
+    </field>
+
+    <field id="sasl_mechanism" label="SASL Mechanism" type="string">
+        <helpText>
+            Select the SASL authentication mechanism. If you are using a non-SASL Protocol, select None.
+        </helpText>
+        <defaultValue>NONE</defaultValue>
+        <allowedValue label="None">
+            <value>NONE</value>
+        </allowedValue>
+        <allowedValue label="Plain">
+            <value>PLAIN</value>
+        </allowedValue>
+        <allowedValue label="SHA-256">
+            <value>SCRAM-SHA-256</value>
+        </allowedValue>
+        <allowedValue label="SHA-512">
+            <value>SCRAM-SHA-512</value>
+        </allowedValue>
+        <allowedValue label="Kerberos (GSSAPI)">
+            <value>GSSAPI</value>
+        </allowedValue>
+        <allowedValue label="OAuth SASL">
+            <value>OAUTHBEARER</value>
+        </allowedValue>
+    </field>
+    
+    <field id="oauth_token_url" label="OAuth Token URL" type="string">
+        <helpText>Enter the URL for the callback handler</helpText>
+        <defaultValue>https://xxx.oktapreview.com/oauth2/default/v1/token</defaultValue>
+        <visibilityCondition>
+            <valueCondition fieldId="sasl_mechanism">
+                <value>OAUTHBEARER</value>
+            </valueCondition>
+        </visibilityCondition>
+    </field>
+    <field id="oauth_client_id" label="OAuth Client ID" type="string">
+        <helpText>Enter the OAuth Client ID for this instance</helpText>
+        <defaultValue></defaultValue>
+        <visibilityCondition>
+            <valueCondition fieldId="sasl_mechanism">
+                <value>OAUTHBEARER</value>
+            </valueCondition>
+        </visibilityCondition>
+    </field>
+    <field id="oauth_client_secret" label="OAuth Client Secret" type="password">
+        <helpText>Enter the OAuth Client Secret for this instance</helpText>
+        <visibilityCondition>
+            <valueCondition fieldId="sasl_mechanism">
+                <value>OAUTHBEARER</value>
+            </valueCondition>
+        </visibilityCondition>
+    </field>
+    <field id="oauth_scope" label="Scope" type="string">
+        <helpText>Enter the scope for enabling specific role based access</helpText>
+        <defaultValue></defaultValue>       
+        <visibilityCondition>
+            <valueCondition fieldId="sasl_mechanism">
+                <value>OAUTHBEARER</value>
+            </valueCondition>
+        </visibilityCondition>
+    </field>
+
+    <field id="private_certificate" label="Certificate" type="privatecertificate">
+        <helpText>(Optional) Select a private certificate component for SSL client authentication.</helpText>
+    </field>
+
+    <field id="polling_interval" label="Polling Interval" type="integer">
+        <helpText>
+            Specify how often (in milliseconds) the connector's Listen operation polls the message broker to retrieve
+            batches of messages from the Kafka server.
+        </helpText>
+        <defaultValue>10000</defaultValue>
+    </field>
+
+    <field id="polling_delay" label="Polling Delay" type="integer">
+        <helpText>
+            Specify how often (in milliseconds) the connector's Listen operation waits before starting to poll the
+            message broker and retrieve batches of messages from the Kafka server.
+        </helpText>
+        <defaultValue>10000</defaultValue>
+    </field>
+
+    <testConnection method="CUSTOM" customOperationType="TEST_CONNECTION"/>
+
+    <operation types="EXECUTE" customTypeId="PRODUCE">
+        <field id="client_id" label="Client ID" type="string">
+            <helpText>
+                Enter the unique ID used to identify the client application in Kafka. In this case, enter the ID that is
+                associated with the Kafka connector.
+            </helpText>
+        </field>
+
+        <field id="acks" label="Acknowledgements" type="string">
+            <helpText>
+                Select the number of acknowledgements the Kafka server must receive before considering the request
+                complete.
+            </helpText>
+            <defaultValue>0</defaultValue>
+            <allowedValue label="0">
+                <value>0</value>
+            </allowedValue>
+            <allowedValue label="1">
+                <value>1</value>
+            </allowedValue>
+            <allowedValue label="ALL">
+                <value>all</value>
+            </allowedValue>
+        </field>
+
+        <field id="compression_type" label="Compression Type" type="string">
+            <helpText>
+                Select the format used to compress and send messages to the Kafka server.
+            </helpText>
+            <defaultValue>none</defaultValue>
+            <allowedValue label="None">
+                <value>none</value>
+            </allowedValue>
+            <allowedValue label="GZIP">
+                <value>gzip</value>
+            </allowedValue>
+            <allowedValue label="SNAPPY">
+                <value>snappy</value>
+            </allowedValue>
+            <allowedValue label="LZ4">
+                <value>lz4</value>
+            </allowedValue>
+        </field>
+
+        <field id="operation_timeout" label="Maximum Time to Wait" type="integer">
+            <helpText>
+                The length of time in milliseconds to wait for the message to be published before failing with a timeout
+                error.
+            </helpText>
+            <defaultValue>30000</defaultValue>
+        </field>
+
+        <field id="partition_id" label="Partition ID" type="integer" overrideable="true">
+            <helpText>
+                Enter the partition ID where the message is going to be stored. If blank, the broker will
+                automatically assign the partition
+            </helpText>
+        </field>
+
+        <field id="header_properties" label="Headers Properties" type="customproperties" overrideable="true">
+            <helpText>Indicate the key/value pairs to be sent as message headers</helpText>
+        </field>
+
+        <field id="allow_dynamic_topics" label="Allow Dynamic Topics" type="boolean" scope="browseOnly">
+            <helpText>
+                If selected, displays Dynamic Topic as the single option available in the list of Object Types. If
+                selected, you must provide the Topic name using a Document Property to indicate where the message is
+                published or a new field will allow you to define the topic name.
+            </helpText>
+            <defaultValue>false</defaultValue>
+        </field>
+
+        <field id="topic_name" label="Topic Name" type="string" scope="browseOnly">
+            <helpText>
+                Enter the topic name to indicate where the message is published.
+            </helpText>
+            <visibilityCondition>
+                <valueCondition fieldId="allow_dynamic_topics">
+                    <value>true</value>
+                </valueCondition>
+            </visibilityCondition>
+        </field>
+    </operation>
+
+    <operation types="EXECUTE" customTypeId="CONSUME" trackedDocument="response">
+
+        <field id="client_id" label="Client ID" type="string">
+            <helpText>
+                Enter the unique ID used to identify the client application in Kafka. In this case, enter the ID that is
+                associated with the Kafka connector.
+            </helpText>
+        </field>
+
+        <field id="consumer_group" label="Consumer Group" type="string">
+            <helpText>
+                Enter the unique string that identifies the consumer group which the connector belongs to.
+            </helpText>
+        </field>
+
+        <field id="max_wait_timeout" label="Receive Message Timeout" type="integer">
+            <helpText>
+                Enter the length of time in milliseconds (the default is 30000) that the operation waits to receive
+                messages. The process continues without waiting for the period to expire, if all messages are received
+                before this condition is met or the Minimum Number of Messages is reached.
+            </helpText>
+            <defaultValue>30000</defaultValue>
+        </field>
+
+        <field id="min_messages" label="Minimum Number of Messages" type="integer">
+            <helpText>
+                Enter the number of messages the operation should retrieve before ending the execution. The process
+                continues until this condition is met, or the Maximum Wait Timeout is reached.
+                When set to 0 or a negative number, the connector retrieves messages until the Maximum Wait Timeout is
+                reached.
+            </helpText>
+            <defaultValue>0</defaultValue>
+        </field>
+
+        <field id="autocommit" label="Autocommit" type="boolean">
+            <helpText>
+                Select to have the connector automatically commit all retrieved messages. If this field is cleared, use
+                the Commit Offset operation to commit messages.
+            </helpText>
+        </field>
+
+        <field id="auto_offset_reset" label="Auto Offset Reset" type="string">
+            <helpText>
+                Select to start message consumption at the "earliest" offset (default) or the "latest" offset when no
+                initial offset is indicated in Kafka.
+            </helpText>
+            <defaultValue>earliest</defaultValue>
+            <allowedValue label="Earliest">
+                <value>earliest</value>
+            </allowedValue>
+            <allowedValue label="Latest">
+                <value>latest</value>
+            </allowedValue>
+        </field>
+
+        <field id="assign_partitions" label="Manually assign partitions" type="boolean">
+            <helpText>
+                Select to manually assign partitions where messages will be read.
+            </helpText>
+            <defaultValue>false</defaultValue>
+        </field>
+
+        <field id="partition_ids" label="Partition IDs" type="string">
+            <helpText>
+                Enter the IDs partition to be consumed (partitions are 0 base indexed), this values should be comma
+                separated if is more than one partition ex: 0,1,2
+            </helpText>
+            <visibilityCondition>
+                <valueCondition fieldId="assign_partitions">
+                    <value>true</value>
+                </valueCondition>
+            </visibilityCondition>
+        </field>
+
+        <field id="allow_dynamic_topics" label="Allow Dynamic Topics" type="boolean" scope="browseOnly">
+            <helpText>
+                Select to display Dynamic Topic as the single option available in the list of Object Types and
+                a new field will allow you to define the topic for consume operation.
+            </helpText>
+            <defaultValue>false</defaultValue>
+        </field>
+
+        <field id="topic_name" label="Topic Name" type="string" scope="browseOnly">
+            <helpText>
+                Enter the topic name to indicate where the messages are consumed from.
+            </helpText>
+            <visibilityCondition>
+                <valueCondition fieldId="allow_dynamic_topics">
+                    <value>true</value>
+                </valueCondition>
+            </visibilityCondition>
+        </field>
+    </operation>
+
+    <operation types="EXECUTE" customTypeId="COMMIT_OFFSET" customTypeLabel="COMMIT OFFSET">
+        <field id="client_id" label="Client ID" type="string">
+            <helpText>
+                Enter the unique ID used to identify the client application in Kafka. In this case, enter the ID that is
+                associated with the Kafka connector.
+            </helpText>
+        </field>
+
+        <field id="consumer_group" label="Consumer Group" type="string">
+            <helpText>
+                Enter the unique string that identifies the consumer group which the connector belongs to.
+            </helpText>
+        </field>
+
+        <field id="allow_dynamic_topics" label="Allow Dynamic Topics" type="boolean" scope="browseOnly">
+            <helpText>
+                Select to display Dynamic Topic as the single option available in the list of Object Types. If selected,
+                you must provide the Topic name in the input document to indicate where the message is committed
+                or a new field will allow you to define the topic name.
+            </helpText>
+            <defaultValue>false</defaultValue>
+        </field>
+
+        <field id="topic_name" label="Topic Name" type="string" scope="browseOnly">
+            <helpText>
+                Enter the topic name to indicate where the message is committed.
+            </helpText>
+            <visibilityCondition>
+                <valueCondition fieldId="allow_dynamic_topics">
+                    <value>true</value>
+                </valueCondition>
+            </visibilityCondition>
+        </field>
+
+    </operation>
+
+    <operation types="LISTEN" customTypeId="LISTEN">
+
+        <field id="client_id" label="Client ID" type="string">
+            <helpText>
+                Enter the unique ID used to identify the client application in Kafka. In this case, enter the ID that is
+                associated with the Kafka connector.
+            </helpText>
+        </field>
+
+        <field id="consumer_group" label="Consumer Group" type="string">
+            <helpText>
+                Enter the unique string that identifies the consumer group which the connector belongs to.
+            </helpText>
+        </field>
+
+        <field id="max_messages_poll" label="Maximum Number of Messages per poll" type="integer">
+            <helpText>
+                Specify the maximum number of messages to return from the Kafka message broker for a single poll.
+            </helpText>
+            <defaultValue>500</defaultValue>
+        </field>
+
+        <!-- This field is included to allow the connector to have new delivery policies in future iterations -->
+        <field id="delivery_policy" label="Message Delivery Policy" type="string">
+            <helpText>
+                Select the delivery policy to guarantee message delivery between the producer and consumer. At least
+                once indicates that messages are never lost, but may be redelivered.
+            </helpText>
+            <defaultValue>AT_LEAST_ONCE</defaultValue>
+            <allowedValue label="At least once">
+                <value>AT_LEAST_ONCE</value>
+            </allowedValue>
+        </field>
+
+        <field id="auto_offset_reset" label="Auto Offset Reset" type="string">
+            <helpText>
+                Select to start message consumption at the "earliest" offset (default) or the "latest" offset when no
+                initial offset is indicated in Kafka.
+            </helpText>
+            <defaultValue>earliest</defaultValue>
+            <allowedValue label="Earliest">
+                <value>earliest</value>
+            </allowedValue>
+            <allowedValue label="Latest">
+                <value>latest</value>
+            </allowedValue>
+        </field>
+
+        <field id="is_singleton" label="Singleton Listener" type="boolean">
+            <helpText>
+                If selected, only one instance of a singleton operation is started for each container.
+                For multi-node containers, the operation starts on only one node.
+            </helpText>
+            <defaultValue>false</defaultValue>
+        </field>
+
+        <field id="assign_partitions" label="Manually assign partitions" type="boolean">
+            <helpText>
+                Select to manually assign partitions where messages will be read.
+            </helpText>
+            <defaultValue>false</defaultValue>
+        </field>
+
+        <field id="partition_ids" label="Partition IDs" type="string">
+            <helpText>
+                Enter the IDs partition to be consumed (partitions are 0 base indexed), this values should be comma
+                separated if is more than one partition ex: 0,1,2
+            </helpText>
+            <visibilityCondition>
+                <valueCondition fieldId="assign_partitions">
+                    <value>true</value>
+                </valueCondition>
+            </visibilityCondition>
+        </field>
+
+        <field id="allow_dynamic_topics" label="Allow Dynamic Topics" type="boolean" scope="browseOnly">
+            <helpText>
+                Select to display Dynamic Topic as the single option available in the list of Object Types and
+                a new field will allow you to define the topic to listen for messages.
+            </helpText>
+            <defaultValue>false</defaultValue>
+        </field>
+
+        <field id="topic_name" label="Topic Name" type="string" scope="browseOnly">
+            <helpText>
+                Enter the topic name you want to pull messages from into your process.
+            </helpText>
+            <visibilityCondition>
+                <valueCondition fieldId="allow_dynamic_topics">
+                    <value>true</value>
+                </valueCondition>
+            </visibilityCondition>
+        </field>
+    </operation>
+
+    <dynamicProperty id="message_key" label="Message Key" type="string"/>
+    <dynamicProperty id="topic_name" label="Topic Name" type="string"/>
+
+    <trackedProperty id="message_key" label="Message Key"/>
+    <trackedProperty id="topic_name" label="Topic Name"/>
+    <trackedProperty id="message_offset" label="Offset ID"/>
+    <trackedProperty id="topic_partition" label="Partition ID"/>
+    <trackedProperty id="message_timestamp" label="Message Timestamp"/>
+
+    <trackedGroup id="custom_header_properties" label="Message Headers"/>
+</GenericConnectorDescriptor>

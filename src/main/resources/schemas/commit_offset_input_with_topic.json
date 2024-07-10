@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "properties": {
+    "topic": {
+      "type": "string"
+    },
+    "partition": {
+      "type": "integer"
+    },
+    "offset": {
+      "type": "integer"
+    },
+    "metadata": {
+      "type": "string"
+    }
+  },
+  "type": "object"
+}
