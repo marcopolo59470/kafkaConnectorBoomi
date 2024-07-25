@@ -1,6 +1,7 @@
 package com.boomi.connector.kafka.configuration;
 
 import com.boomi.connector.api.ConnectorContext;
+import com.boomi.connector.api.ConnectorException;
 import com.boomi.connector.kafka.KafkaConnection;
 import com.boomi.connector.kafka.client.common.kerberos.KerberosTicketCache;
 import com.boomi.connector.kafka.client.common.kerberos.KerberosTicketKey;
@@ -43,67 +44,68 @@ public abstract class KafkaConfiguration<T extends AbstractConfig> implements Co
     private final int _maxRequestSize;
     private final ConnectorContext _context;
     private final String _clientId;
-    private final AvroMode _avroType;
 
     protected KafkaConfiguration(KafkaConnection<? extends ConnectorContext> connection) {
         _context = connection.getContext();
         _credentials = Objects.requireNonNull(connection.getCredentials());
-        _configs = buildBaseConfiguration(connection.getBootstrapServers());
+        _configs = buildBaseConfiguration(connection.getBootstrapServers(), connection.getSchemaRegistry(), connection.getBasicAuth(), connection.getBasicSource());
         _maxRequestSize = connection.getMaxRequestSize();
         _clientId = connection.getClientId();
-        _avroType = connection.getAvroType();
+        String _avroType = connection.getAvroType().getCode();
 
-        setMaxRequestSize(_maxRequestSize, _configs);
-        switch (_avroType.getCode()){
-            case 0:
-                setSerialization(_configs);
-                break;
-            case 1:
-                setSerializationWithMessage(_configs);
-                break;
-            case 2:
-                setSerializationWithMessageAndKey(_configs);
-                break;
-        }
+        setMaxRequestSize(_maxRequestSize, _configs, _avroType);
+//setSerializationWithMessage(_configs);
 
     }
 
-    private static void setMaxRequestSize(int maxRequestSize, Map<String, Object> configs) {
+    private static void setMaxRequestSize(int maxRequestSize, Map<String, Object> configs, String _avroType) {
         configs.put(ProducerConfig.MAX_REQUEST_SIZE_CONFIG, maxRequestSize);
         configs.put(ProducerConfig.BATCH_SIZE_CONFIG, maxRequestSize);
         configs.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, maxRequestSize);
         configs.put(ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG, maxRequestSize);
+
+        if (Objects.equals(_avroType, "1")) {
+            setSerializationWithMessage(configs);
+        } else if (Objects.equals(_avroType, "2")) {
+            setSerializationWithMessageAndKey(configs);
+        } else {
+            setSerialization(configs);
+        }
     }
 
-    private void setSerializationWithMessage(Map<String, Object> configs) {
-        configs.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-        configs.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class.getName());
-        configs.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-        configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, InputStreamSerializer.class.getName());
+    private static void setSerializationWithMessage(Map<String, Object> configs) {
+        configs.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getTypeName());
+        configs.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class.getTypeName());
+        configs.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getTypeName());
+        configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, InputStreamSerializer.class.getTypeName());
     }
 
-    private void setSerializationWithMessageAndKey(Map<String, Object> configs) {
-        configs.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class.getName());
-        configs.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class.getName());
-        configs.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-        configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, InputStreamSerializer.class.getName());
+    private static void setSerializationWithMessageAndKey(Map<String, Object> configs) {
+        configs.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class.getTypeName());
+        configs.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class.getTypeName());
+        configs.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getTypeName());
+        configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, InputStreamSerializer.class.getTypeName());
     }
 
     private static void setSerialization(Map<String, Object> configs) {
-        configs.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-        configs.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, InputStreamDeserializer.class.getName());
-        configs.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-        configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, InputStreamSerializer.class.getName());
+        configs.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getTypeName());
+        configs.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, InputStreamDeserializer.class.getTypeName());
+        configs.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getTypeName());
+        configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, InputStreamSerializer.class.getTypeName());
     }
 
 
-    private static Map<String, Object> buildBaseConfiguration(String bootstrapServers) {
+    private static Map<String, Object> buildBaseConfiguration(String bootstrapServers, String url, String basic, String source) {
         Map<String, Object> configs = new HashMap<>();
         configs.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         // setting max inflight request to 1 as we are not supporting multithreading
         configs.put(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, 1);
         // disable retries
         configs.put(CommonClientConfigs.RETRIES_CONFIG, 0);
+        configs.put("schema.registry.url", url);
+        configs.put("basic.auth.user.info", basic);
+        configs.put("basic.auth.credentials.source", source);
+
 
         return configs;
     }

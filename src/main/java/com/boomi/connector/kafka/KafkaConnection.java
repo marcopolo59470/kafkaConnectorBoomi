@@ -13,6 +13,7 @@ import com.boomi.util.IOUtil;
 import com.boomi.util.LogUtil;
 import com.boomi.util.NumberUtil;
 
+import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.common.network.InvalidReceiveException;
 
@@ -41,7 +42,7 @@ public class KafkaConnection<C extends ConnectorContext> extends BaseConnection<
      * @return a Set of the available topics
      */
     Set<String> getTopics() {
-        Consumer<String, InputStream> consumer = null;
+        Consumer<Object, InputStream> consumer = null;
 
         try {
             consumer = new BoomiCustomConsumer(ConsumerConfiguration.browse(this));
@@ -60,8 +61,10 @@ public class KafkaConnection<C extends ConnectorContext> extends BaseConnection<
     }
 
     public AvroMode getAvroType() {
-        String mode = getContext().getConnectionProperties().getProperty(Constants.KEY_BOOTSTRAP_SERVERS);
-        return (mode == null || mode.isEmpty()) ? AvroMode.NO_MESSAGE : AvroMode.getByCode(Integer.getInteger(mode));
+        String mode = getContext().getConnectionProperties().getProperty(Constants.KEY_AVRO_MODE);
+
+        //LOG.log(Level.INFO, AvroMode.getByCode(mode).toString());
+        return (mode == null || mode.isEmpty()) ? AvroMode.NO_MESSAGE : AvroMode.getByCode(mode);
     }
     public Credentials getCredentials() {
         return _credentials;
@@ -69,6 +72,18 @@ public class KafkaConnection<C extends ConnectorContext> extends BaseConnection<
 
     public String getBootstrapServers() {
         return getContext().getConnectionProperties().getProperty(Constants.KEY_SERVERS);
+    }
+
+    public String getSchemaRegistry() {
+        return getContext().getConnectionProperties().getProperty(Constants.SCHEMA_REGISTRY_URL);
+    }
+
+    public String getBasicAuth() {
+        return getContext().getConnectionProperties().getProperty(Constants.BASIC_AUTH_USER_INFO);
+    }
+
+    public String getBasicSource() {
+        return getContext().getConnectionProperties().getProperty(Constants.BASIC_AUTH_CREDENTIALS_SOURCE);
     }
 
     public int getMaxRequestSize() {

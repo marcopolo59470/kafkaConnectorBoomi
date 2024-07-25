@@ -20,15 +20,15 @@
 
     <field type="string" id="avro.mode" label="Avro mode">
         <helpText>Choose if you want only avro message or avro key and message.</helpText>
-        <defaultValue>No avro</defaultValue>
+        <defaultValue>0</defaultValue>
         <allowedValue label="No avro">
-            <value>no.avro</value>
+            <value>0</value>
         </allowedValue>
         <allowedValue label="Avro message">
-            <value>only.message</value>
+            <value>1</value>
         </allowedValue>
         <allowedValue label="Avro key and message">
-            <value>key.and.message</value>
+            <value>2</value>
         </allowedValue>
     </field>
 
@@ -37,7 +37,22 @@
             Enter a list of host and port pairs, separated by commas.
         </helpText>
     </field>
-
+    <field id="schema.registry.url" label="Schema registry URL" type="string">
+        <helpText>
+            Enter the schema registry url.
+        </helpText>
+    </field>
+    <field id="basic.auth.user.info" label="basic.auth.user.info" type="password">
+        <helpText>
+            https://docs.confluent.io/platform/current/schema-registry/connect.html#configuration-options
+        </helpText>
+    </field>
+    <field id="basic.auth.credentials.source" label="basic.auth.credentials.source" type="string">
+        <helpText>
+            https://docs.confluent.io/platform/current/schema-registry/connect.html#configuration-options
+        </helpText>
+        <defaultValue>USER_INFO</defaultValue>
+    </field>
     <field id="service_principal" label="Service Name/Principal" type="string">
         <helpText>
             A unique identifier for the service instance accessing the Kerberos account. The instance is typically

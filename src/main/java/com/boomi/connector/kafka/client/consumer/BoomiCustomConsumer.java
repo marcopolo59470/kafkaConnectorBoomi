@@ -3,20 +3,25 @@ package com.boomi.connector.kafka.client.consumer;
 import com.boomi.connector.kafka.operation.commit.Committable;
 import com.boomi.util.CollectionUtil;
 
+
+import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.KafkaException;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.serialization.Deserializer;
+import org.apache.kafka.common.utils.Utils;
 
 import java.io.InputStream;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Properties;
 
 /**
  * An extension of {@link KafkaConsumer} with custom method overloads.
  */
-public class BoomiCustomConsumer extends KafkaConsumer<String, InputStream> {
+public class BoomiCustomConsumer extends KafkaConsumer<Object, InputStream> {
 
     private boolean _assignPartitions;
 
@@ -24,6 +29,11 @@ public class BoomiCustomConsumer extends KafkaConsumer<String, InputStream> {
         super(configuration.getConfig(), configuration.getClientId(), configuration.getChannelBuilder(),
                 configuration.getMaxRequestSize());
     }
+
+    /**public BoomiCustomConsumer(Properties configuration, Deserializer<String> keyDeserializer, Deserializer<GenericRecord> valueDeserializer) {
+        super(configuration, keyDeserializer, valueDeserializer);
+    }*/
+
 
     /**
      * Fetches a batch of messages from the subscribed topic.
@@ -36,9 +46,9 @@ public class BoomiCustomConsumer extends KafkaConsumer<String, InputStream> {
      */
     public Iterable<ConsumeMessage> pollMessages(long timeout) {
         return CollectionUtil.apply(poll(Duration.ofMillis(timeout)),
-                new CollectionUtil.Function<ConsumerRecord<String, InputStream>, ConsumeMessage>() {
+                new CollectionUtil.Function<ConsumerRecord<Object, InputStream>, ConsumeMessage>() {
                     @Override
-                    public ConsumeMessage apply(ConsumerRecord<String, InputStream> record) {
+                    public ConsumeMessage apply(ConsumerRecord<Object, InputStream> record) {
                         return new ConsumeMessage(record);
                     }
                 });

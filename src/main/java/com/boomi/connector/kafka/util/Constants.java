@@ -13,7 +13,10 @@ public final class Constants {
     public static final String KEY_SASL_MECHANISM = "sasl_mechanism";
     public static final String KEY_OAUTH_TOKEN_URL = "oauth_token_url";
     public static final String KEY_OAUTH_CLIENT_ID = "oauth_client_id";
-    public static final String KEY_BOOTSTRAP_SERVERS = "bootstrap.servers";
+    public static final String KEY_AVRO_MODE = "avro.mode";
+    public static final String SCHEMA_REGISTRY_URL = "schema.registry.url";
+    public static final String BASIC_AUTH_USER_INFO = "basic.auth.user.info";
+    public static final String BASIC_AUTH_CREDENTIALS_SOURCE = "basic.auth.credentials.source";
     public static final String KEY_OAUTH_CLIENT_SECRET = "oauth_client_secret";
     public static final String KEY_OAUTH_SCOPE = "oauth_scope";
     public static final String KEY_CERTIFICATE = "private_certificate";

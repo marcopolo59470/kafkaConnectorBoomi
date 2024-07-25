@@ -1,19 +1,21 @@
 package com.boomi.connector.kafka.util;
 
-public enum AvroMode {
-    NO_MESSAGE(0, "No Message"),
-    MESSAGE_ONLY(1, "Message Only"),
-    MESSAGE_AND_KEY(2, "Message and Key");
+import java.util.Objects;
 
-    private final int code;
+public enum AvroMode {
+    NO_MESSAGE("0", "No Message"),
+    MESSAGE_ONLY("1", "Message Only"),
+    MESSAGE_AND_KEY("2", "Message and Key");
+
+    private final String code;
     private final String description;
 
-    private AvroMode(int code, String description) {
+    AvroMode(String code, String description) {
         this.code = code;
         this.description = description;
     }
 
-    public int getCode() {
+    public String getCode() {
         return code;
     }
 
@@ -21,9 +23,9 @@ public enum AvroMode {
         return description;
     }
 
-    public static AvroMode getByCode(int code) {
+    public static AvroMode getByCode(String code) {
         for (AvroMode status : values()) {
-            if (status.getCode() == code) {
+            if (Objects.equals(status.getCode(), code)) {
                 return status;
             }
         }
