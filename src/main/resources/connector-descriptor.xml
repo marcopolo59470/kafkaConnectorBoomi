@@ -32,6 +32,94 @@
         </allowedValue>
     </field>
 
+    <field id="key.subject.name.strategy" label="Key - AVRO schema declaration" type="string">
+        <helpText>
+            The key AVRO schema naming strategy.&lt;br&gt;
+            WARNING: To use the RecordNameStrategy, the schema must already be available in the targeted schema registry. This action must be done by the ATM team.
+            &lt;br&gt;https://docs.confluent.io/platform/current/schema-registry/fundamentals/serdes-develop/index.html#how-the-naming-strategies-work
+        </helpText>
+
+        <defaultValue>io.confluent.kafka.serializers.subject.TopicNameStrategy</defaultValue>
+        <allowedValue label="TopicNameStrategy">
+            <value>io.confluent.kafka.serializers.subject.TopicNameStrategy</value>
+        </allowedValue>
+        <allowedValue label="RecordNameStrategy">
+            <value>io.confluent.kafka.serializers.subject.RecordNameStrategy</value>
+        </allowedValue>
+        <allowedValue label="TopicRecordNameStrategy">
+            <value>io.confluent.kafka.serializers.subject.TopicRecordNameStrategy</value>
+        </allowedValue>
+
+    </field>
+
+    <field id="avro.schema.key" label="Key - AVRO schema declaration" type="string">
+        <helpText>
+            (Required) The key AVRO schema.
+            &lt;br&gt;
+            example:
+            &lt;br&gt;
+            {
+            &lt;br&gt;
+            &#xA0;&#xA0;&#xA0;"type" : "record",
+            &lt;br&gt;
+            &#xA0;&#xA0;&#xA0;"namespace" : "com.decathlon.geco",
+            &lt;br&gt;
+            &#xA0;&#xA0;&#xA0;"name" : "Person",
+            &lt;br&gt;
+            &#xA0;&#xA0;&#xA0;"fields" : [
+            &lt;br&gt;
+            &#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;{ "name" : "Name" , "type" : "string" },
+            &lt;br&gt;
+            &#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;{ "name" : "Age" , "type" : "int" }
+            &lt;br&gt;
+            &#xA0;&#xA0;&#xA0;]
+            &lt;br&gt;
+            }
+        </helpText>
+    </field>
+    <field id="value.subject.name.strategy" label="Message - AVRO schema naming strategy" type="string">
+        <helpText>
+            The key AVRO schema naming strategy.&lt;br&gt;
+            WARNING: To use the RecordNameStrategy, the schema must already be available in the targeted schema registry. This action must be done by the ATM team.
+            &lt;br&gt;https://docs.confluent.io/platform/current/schema-registry/fundamentals/serdes-develop/index.html#how-the-naming-strategies-work
+        </helpText>
+
+        <defaultValue>io.confluent.kafka.serializers.subject.TopicNameStrategy</defaultValue>
+        <allowedValue label="TopicNameStrategy">
+            <value>io.confluent.kafka.serializers.subject.TopicNameStrategy</value>
+        </allowedValue>
+        <allowedValue label="RecordNameStrategy">
+            <value>io.confluent.kafka.serializers.subject.RecordNameStrategy</value>
+        </allowedValue>
+        <allowedValue label="TopicRecordNameStrategy">
+            <value>io.confluent.kafka.serializers.subject.TopicRecordNameStrategy</value>
+        </allowedValue>
+    </field>
+    <field id="avro.schema.message" label="Message - AVRO schema declaration" type="string">
+        <helpText>
+            (Required) The message AVRO schema.
+            &lt;br&gt;
+            example:
+            &lt;br&gt;
+            {
+            &lt;br&gt;
+            &#xA0;&#xA0;&#xA0;"type" : "record",
+            &lt;br&gt;
+            &#xA0;&#xA0;&#xA0;"namespace" : "com.decathlon.geco",
+            &lt;br&gt;
+            &#xA0;&#xA0;&#xA0;"name" : "Person",
+            &lt;br&gt;
+            &#xA0;&#xA0;&#xA0;"fields" : [
+            &lt;br&gt;
+            &#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;{ "name" : "Name" , "type" : "string" },
+            &lt;br&gt;
+            &#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;{ "name" : "Age" , "type" : "int" }
+            &lt;br&gt;
+            &#xA0;&#xA0;&#xA0;]
+            &lt;br&gt;
+            }
+        </helpText>
+    </field>
     <field id="bootstrap_servers" label="Broker List" type="string">
         <helpText>
             Enter a list of host and port pairs, separated by commas.
@@ -173,6 +261,7 @@
     <testConnection method="CUSTOM" customOperationType="TEST_CONNECTION"/>
 
     <operation types="EXECUTE" customTypeId="PRODUCE">
+
         <field id="client_id" label="Client ID" type="string">
             <helpText>
                 Enter the unique ID used to identify the client application in Kafka. In this case, enter the ID that is

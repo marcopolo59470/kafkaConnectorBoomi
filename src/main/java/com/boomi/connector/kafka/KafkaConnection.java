@@ -3,9 +3,11 @@ package com.boomi.connector.kafka;
 import com.boomi.connector.api.AtomConfig;
 import com.boomi.connector.api.ConnectorContext;
 import com.boomi.connector.api.ConnectorException;
+import com.boomi.connector.api.PrivateKeyStore;
 import com.boomi.connector.kafka.client.consumer.BoomiCustomConsumer;
 import com.boomi.connector.kafka.client.consumer.ConsumerConfiguration;
 import com.boomi.connector.kafka.configuration.Credentials;
+import com.boomi.connector.kafka.configuration.SSLContextFactory;
 import com.boomi.connector.kafka.util.AvroMode;
 import com.boomi.connector.kafka.util.Constants;
 import com.boomi.connector.util.BaseConnection;
@@ -17,6 +19,7 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.common.network.InvalidReceiveException;
 
+import javax.net.ssl.SSLContext;
 import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.Set;
@@ -36,6 +39,11 @@ public class KafkaConnection<C extends ConnectorContext> extends BaseConnection<
         _credentials = new Credentials(context);
     }
 
+    /**public SSLContext getPrivateCertificate() {
+        SSLContextFactory sslContextFactory = new SSLContextFactory();
+        PrivateKeyStore certificate = getContext().getConnectionProperties().getPrivateKeyStoreProperty(Constants.KEY_CERTIFICATE_OPERATION);
+        return sslContextFactory.create(certificate);
+    }*/
     /**
      * Perform a request to Kafka in order to retrieve a {@link Set} of the available topics
      *
@@ -58,6 +66,22 @@ public class KafkaConnection<C extends ConnectorContext> extends BaseConnection<
 
     public String getClientId() {
         return DEFAULT_CLIENT_ID;
+    }
+
+    public String getSchemaKey() {
+        return defaultValueIfNullOrBlank(getContext().getConnectionProperties().getProperty(Constants.AVRO_SCHEMA_KEY), "");
+    }
+
+    public String getSchemaMessage() {
+        return defaultValueIfNullOrBlank(getContext().getConnectionProperties().getProperty(Constants.AVRO_SCHEMA_MESSAGE), "");
+    }
+
+    public String getKeyStrategy() {
+        return getContext().getConnectionProperties().getProperty(Constants.KEY_SUBJECT_NAME_STRATEGY);
+    }
+
+    public String getMessageStrategy() {
+        return getContext().getConnectionProperties().getProperty(Constants.VALUE_SUBJECT_NAME_STRATEGY);
     }
 
     public AvroMode getAvroType() {
@@ -111,5 +135,9 @@ public class KafkaConnection<C extends ConnectorContext> extends BaseConnection<
         }
 
         return value;
+    }
+
+    static String defaultValueIfNullOrBlank(String value, String defaultValue) {
+        return (value == null || value.isBlank()) ? defaultValue : value;
     }
 }

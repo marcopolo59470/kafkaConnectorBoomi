@@ -8,15 +8,20 @@ import com.boomi.connector.api.ResponseUtil;
 import com.boomi.connector.api.UpdateRequest;
 import com.boomi.connector.kafka.exception.InvalidMessageSizeException;
 import com.boomi.connector.kafka.operation.KafkaOperationConnection;
+import com.boomi.connector.kafka.operation.polling.KafkaPollingOperation;
 import com.boomi.connector.kafka.util.Constants;
 import com.boomi.connector.kafka.util.ErrorCodeHelper;
 import com.boomi.connector.kafka.util.ResultUtil;
 import com.boomi.connector.kafka.util.TopicNameUtil;
 import com.boomi.connector.util.BaseUpdateOperation;
 import com.boomi.util.IOUtil;
+import com.boomi.util.LogUtil;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Execute Operation for publishing messages to Apache Kafka.
@@ -33,6 +38,8 @@ public class ProduceOperation extends BaseUpdateOperation {
         _topic = TopicNameUtil.getTopic(connection.getObjectTypeId(), connection.getContext());
         _isDynamicTopic = Constants.DYNAMIC_TOPIC_ID.equals(connection.getObjectTypeId());
     }
+
+    private static final Logger LOG = LogUtil.getLogger(ProduceOperation.class);
 
     @Override
     public KafkaOperationConnection getConnection() {
@@ -52,10 +59,10 @@ public class ProduceOperation extends BaseUpdateOperation {
         BoomiProducer producer = null;
 
         try {
+            int a = 1 + 1 + 1;
             producer = getConnection().createProducer();
-
             for (ObjectData data : updateRequest) {
-                process(producer, data, response);
+                process(producer, data, response, getConnection().getSchemaKey(), getConnection().getSchemaMessage());
             }
         } catch (InterruptedException e) {
             // mark pending documents as Failure
@@ -74,17 +81,27 @@ public class ProduceOperation extends BaseUpdateOperation {
      * Sends the given ObjectData as a message to the Apache Kafka service using the given producer and then add the
      * result in the given response.
      *
-     * @param producer To publish messages to Apache Kafka service.
-     * @param data     The message to send to Apache Kafka service.
-     * @param response Where the result is added.
+     * @param producer      To publish messages to Apache Kafka service.
+     * @param data          The message to send to Apache Kafka service.
+     * @param response      Where the result is added.
+     * @param schemaMessage
      * @throws ConnectorException If a Timeout error arises.
      */
-    private void process(BoomiProducer producer, ObjectData data, OperationResponse response)
+    private void process(BoomiProducer producer, ObjectData data, OperationResponse response, String schemaKey, String schemaMessage)
             throws InterruptedException {
         ProduceMessage message = null;
         try {
             message = new ProduceMessage(data, _topic, producer.getMaxRequestSize());
-            producer.sendMessage(message.toRecord());
+            LOG.fine("1");
+            if (!schemaKey.isBlank()) {
+                LOG.fine("2");
+                producer.sendMessage(message.toAvroMessageAndKeyRecord(schemaKey, schemaMessage));
+                LOG.fine("3");
+            } else if (!schemaMessage.isBlank()){
+                producer.sendMessage(message.toAvroMessageRecord(schemaMessage));
+            } else {
+                producer.sendMessage(message.toRecord());
+            }
             ResponseUtil.addEmptySuccess(response, data, Constants.CODE_SUCCESS);
         } catch (InvalidMessageSizeException e) {
             ResultUtil.addApplicationError(data, response, Constants.CODE_INVALID_SIZE, e.getMessage(), e);
@@ -107,6 +124,8 @@ public class ProduceOperation extends BaseUpdateOperation {
             ResponseUtil.addExceptionFailure(response, data, e);
             // and re throw the Exception
             throw e;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         } finally {
             IOUtil.closeQuietly(message);
         }

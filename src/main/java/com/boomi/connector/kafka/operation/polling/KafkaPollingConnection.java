@@ -3,11 +3,14 @@ package com.boomi.connector.kafka.operation.polling;
 
 import com.boomi.connector.api.ConnectorException;
 import com.boomi.connector.api.OperationContext;
+import com.boomi.connector.api.PrivateKeyStore;
 import com.boomi.connector.kafka.client.consumer.BoomiCustomConsumer;
+import com.boomi.connector.kafka.configuration.SSLContextFactory;
 import com.boomi.connector.kafka.operation.KafkaOperationConnection;
 import com.boomi.connector.kafka.util.Constants;
 import com.boomi.util.NumberUtil;
 
+import javax.net.ssl.SSLContext;
 import java.util.function.Supplier;
 
 /**
@@ -65,6 +68,12 @@ public class KafkaPollingConnection extends KafkaOperationConnection {
 
         return pollInterval;
     }
+
+    /**public SSLContext getPrivateCertificate() {
+        SSLContextFactory sslContextFactory = new SSLContextFactory();
+        PrivateKeyStore certificate = getContext().getConnectionProperties().getPrivateKeyStoreProperty(Constants.KEY_CERTIFICATE_OPERATION);
+        return sslContextFactory.create(certificate);
+    }*/
 
     String getConsumerGroup() {
         return getContext().getOperationProperties().getProperty(Constants.KEY_CONSUMER_GROUP);

@@ -28,7 +28,6 @@ public class Credentials {
     private final String _oauthScope;
 
     public Credentials(ConnectorContext context) {
-        SSLContextFactory sslContextFactory = new SSLContextFactory();
         PropertyMap connectionProperties = context.getConnectionProperties();
 
         // connection properties
@@ -52,8 +51,15 @@ public class Credentials {
 
         // SSL context
 
+        //_sslContext = (certificate != null) ? certificate : createSSLContext(connectionProperties);
+        _sslContext = createSSLContext(connectionProperties);
+        //_sslContext = null;
+    }
+
+    private SSLContext createSSLContext(PropertyMap connectionProperties) {
+        SSLContextFactory sslContextFactory = new SSLContextFactory();
         PrivateKeyStore keyStore = connectionProperties.getPrivateKeyStoreProperty(Constants.KEY_CERTIFICATE);
-        _sslContext = sslContextFactory.create(keyStore);
+        return sslContextFactory.create(keyStore);
     }
 
     private static void validateProtocolAndMechanism(SecurityProtocol protocol, SASLMechanism mechanism) {

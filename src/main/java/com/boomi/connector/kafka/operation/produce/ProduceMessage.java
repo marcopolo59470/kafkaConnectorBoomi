@@ -5,11 +5,13 @@ import com.boomi.connector.api.ConnectorException;
 import com.boomi.connector.api.DynamicPropertyMap;
 import com.boomi.connector.api.ObjectData;
 import com.boomi.connector.kafka.exception.InvalidMessageSizeException;
+import com.boomi.connector.kafka.util.AvroMapper;
 import com.boomi.connector.kafka.util.Constants;
 import com.boomi.util.CollectionUtil;
 import com.boomi.util.IOUtil;
 import com.boomi.util.StringUtil;
 
+import org.apache.avro.generic.GenericData;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.Header;
 import org.apache.kafka.common.header.internals.RecordHeader;
@@ -23,6 +25,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.boomi.connector.kafka.util.AvroMapper.convertInputStreamToString;
+import static com.boomi.connector.kafka.util.Tools.translateEscapes;
+
 /**
  * Representation of the messages to publish to Apache Kafka service.
  */
@@ -35,6 +40,8 @@ public class ProduceMessage implements Closeable {
     private final String _topic;
     private final Iterable<Header> _headers;
     private final Integer _partitionId;
+    private AvroMapper avroMessageMapper;
+
 
     /**
      * Construct a new instance of {@link ProduceMessage} from the given {@link ObjectData}.
@@ -122,7 +129,7 @@ public class ProduceMessage implements Closeable {
      * @return the message key.
      */
     private static String extractKey(ObjectData data) {
-        return data.getDynamicProperties().get(Constants.KEY_MESSAGE_KEY);
+        return translateEscapes(data.getDynamicProperties().get(Constants.KEY_MESSAGE_KEY));
     }
 
     /**
@@ -161,6 +168,20 @@ public class ProduceMessage implements Closeable {
      */
     ProducerRecord<String, MessagePayload> toRecord() {
         return new ProducerRecord<>(_topic, _partitionId, _key, _payload, _headers);
+    }
+
+    ProducerRecord<String, GenericData.Record> toAvroMessageRecord(String schemaMessage) throws IOException {
+        this.avroMessageMapper = new AvroMapper(schemaMessage);
+        return new ProducerRecord<>(_topic, _partitionId, _key, avroMessageMapper.toAvroRecord(_payload.toString()), _headers);
+    }
+
+    ProducerRecord<GenericData.Record, GenericData.Record> toAvroMessageAndKeyRecord(String schemaKey, String schemaMessage) throws IOException {
+        AvroMapper avroKeyMapper = new AvroMapper(translateEscapes(schemaKey));
+        this.avroMessageMapper = new AvroMapper(translateEscapes(schemaMessage));
+        GenericData.Record key = avroKeyMapper.toAvroRecord(_key);
+        GenericData.Record message = avroMessageMapper.toAvroRecord(convertInputStreamToString(_payload.getInputStream()));
+        throw new ConnectorException("p/ " + message + "   k/ " + key);
+        //return new ProducerRecord<>(_topic, _partitionId, key, message, _headers);
     }
 
     /**

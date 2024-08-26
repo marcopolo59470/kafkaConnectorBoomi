@@ -52,12 +52,18 @@ public final class Constants {
     public static final String KEY_AUTO_OFFSET_RESET = "auto_offset_reset";
 
     // listen
+    //public static final String KEY_CERTIFICATE_OPERATION = "private_certificate_operation";
     public static final String KEY_POLLING_INTERVAL = "polling_interval";
     public static final String KEY_MAX_MESSAGES = "max_messages_poll";
     public static final String KEY_POLLING_DELAY = "polling_delay";
     public static final String KEY_SINGLETON_LISTENER = "is_singleton";
     public static final String KEY_ASSIGN_PARTITIONS = "assign_partitions";
     public static final String KEY_PARTITION_IDS = "partition_ids";
+    public static final String AVRO_SCHEMA_KEY = "avro.schema.key";
+    public static final String KEY_SUBJECT_NAME_STRATEGY = "key.subject.name.strategy";
+    public static final String VALUE_SUBJECT_NAME_STRATEGY = "value.subject.name.strategy";
+    public static final String AVRO_SCHEMA_MESSAGE = "avro.schema.message";
+
 
     // 10 seconds
     public static final long DEFAULT_POLLING_DELAY = 10_000L;

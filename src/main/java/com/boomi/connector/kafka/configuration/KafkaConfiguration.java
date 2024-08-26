@@ -8,12 +8,13 @@ import com.boomi.connector.kafka.client.common.kerberos.KerberosTicketKey;
 import com.boomi.connector.kafka.client.common.network.BoomiChannelFactory;
 import com.boomi.connector.kafka.client.common.serialization.InputStreamDeserializer;
 import com.boomi.connector.kafka.client.common.serialization.InputStreamSerializer;
-import com.boomi.connector.kafka.util.AvroMode;
 import com.boomi.connector.util.ConnectorCache;
 import com.boomi.connector.util.ConnectorCacheFactory;
 import com.boomi.util.ByteUnit;
 
+import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
+import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -44,6 +45,7 @@ public abstract class KafkaConfiguration<T extends AbstractConfig> implements Co
     private final int _maxRequestSize;
     private final ConnectorContext _context;
     private final String _clientId;
+    private final String _avroType;
 
     protected KafkaConfiguration(KafkaConnection<? extends ConnectorContext> connection) {
         _context = connection.getContext();
@@ -51,40 +53,44 @@ public abstract class KafkaConfiguration<T extends AbstractConfig> implements Co
         _configs = buildBaseConfiguration(connection.getBootstrapServers(), connection.getSchemaRegistry(), connection.getBasicAuth(), connection.getBasicSource());
         _maxRequestSize = connection.getMaxRequestSize();
         _clientId = connection.getClientId();
-        String _avroType = connection.getAvroType().getCode();
+        //TODO: change this
+        _avroType = connection.getAvroType().getCode();
 
-        setMaxRequestSize(_maxRequestSize, _configs, _avroType);
+        setMaxRequestSize(_maxRequestSize, _configs);
+
+        if (Objects.equals(_avroType, "2")) {
+            setSerializationWithMessageAndKey(_configs, connection.getKeyStrategy(), connection.getMessageStrategy());
+        } else if (Objects.equals(_avroType, "1")) {
+            setSerializationWithMessage(_configs, connection.getMessageStrategy());
+        } else {
+            setSerialization(_configs);
+        }
 //setSerializationWithMessage(_configs);
 
     }
 
-    private static void setMaxRequestSize(int maxRequestSize, Map<String, Object> configs, String _avroType) {
+    private static void setMaxRequestSize(int maxRequestSize, Map<String, Object> configs) {
         configs.put(ProducerConfig.MAX_REQUEST_SIZE_CONFIG, maxRequestSize);
         configs.put(ProducerConfig.BATCH_SIZE_CONFIG, maxRequestSize);
         configs.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, maxRequestSize);
         configs.put(ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG, maxRequestSize);
-
-        if (Objects.equals(_avroType, "1")) {
-            setSerializationWithMessage(configs);
-        } else if (Objects.equals(_avroType, "2")) {
-            setSerializationWithMessageAndKey(configs);
-        } else {
-            setSerialization(configs);
-        }
     }
 
-    private static void setSerializationWithMessage(Map<String, Object> configs) {
+    private static void setSerializationWithMessage(Map<String, Object> configs, String _messageStrategy) {
         configs.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getTypeName());
         configs.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class.getTypeName());
         configs.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getTypeName());
-        configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, InputStreamSerializer.class.getTypeName());
+        configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getTypeName());
+        configs.put(AbstractKafkaSchemaSerDeConfig.VALUE_SUBJECT_NAME_STRATEGY, _messageStrategy);
     }
 
-    private static void setSerializationWithMessageAndKey(Map<String, Object> configs) {
+    private static void setSerializationWithMessageAndKey(Map<String, Object> configs, String _keyStrategy, String _messageStrategy) {
         configs.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class.getTypeName());
         configs.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class.getTypeName());
-        configs.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getTypeName());
-        configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, InputStreamSerializer.class.getTypeName());
+        configs.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getTypeName());
+        configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getTypeName());
+        configs.put(AbstractKafkaSchemaSerDeConfig.KEY_SUBJECT_NAME_STRATEGY, _keyStrategy);
+        configs.put(AbstractKafkaSchemaSerDeConfig.VALUE_SUBJECT_NAME_STRATEGY, _messageStrategy);
     }
 
     private static void setSerialization(Map<String, Object> configs) {

@@ -1,8 +1,15 @@
 package com.boomi.connector.kafka.client.producer;
 
+import com.boomi.connector.api.ConnectorException;
+import org.apache.kafka.clients.KafkaClient;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.clients.producer.internals.ProducerInterceptors;
+import org.apache.kafka.clients.producer.internals.ProducerMetadata;
+import org.apache.kafka.common.network.ChannelBuilder;
+import org.apache.kafka.common.serialization.Serializer;
+import org.apache.kafka.common.utils.Time;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -22,6 +29,7 @@ public class BoomiCustomProducer<K, V> extends KafkaProducer<K, V> {
                 configuration.getMaxRequestSize());
         _maxWaitTimeout = configuration.getMaxWaitTimeout();
         _maxRequestSize = configuration.getMaxRequestSize();
+
     }
 
     /**
@@ -41,7 +49,7 @@ public class BoomiCustomProducer<K, V> extends KafkaProducer<K, V> {
     public void sendMessage(ProducerRecord<K, V> record)
             throws InterruptedException, ExecutionException, java.util.concurrent.TimeoutException {
         Future<RecordMetadata> send = send(record);
-        flush();
+        flush();//
         send.get(_maxWaitTimeout, TimeUnit.MILLISECONDS);
     }
 
