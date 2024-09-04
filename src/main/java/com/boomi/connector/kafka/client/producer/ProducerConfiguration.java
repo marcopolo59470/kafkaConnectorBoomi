@@ -6,6 +6,7 @@ import com.boomi.connector.kafka.operation.KafkaOperationConnection;
 import com.boomi.connector.kafka.util.Constants;
 import com.boomi.util.LogUtil;
 
+import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.producer.ProducerConfig;
 
@@ -38,6 +39,8 @@ public class ProducerConfiguration extends KafkaConfiguration<ProducerConfig> {
         putConfig(ProducerConfig.MAX_BLOCK_MS_CONFIG, _maxWaitTimeout);
         putConfig(ProducerConfig.ACKS_CONFIG, properties.getProperty(Constants.KEY_ACKS));
         putConfig(ProducerConfig.COMPRESSION_TYPE_CONFIG, properties.getProperty(Constants.KEY_COMPRESSION_TYPE));
+        putConfig(AbstractKafkaSchemaSerDeConfig.KEY_SUBJECT_NAME_STRATEGY, properties.getProperty(Constants.KEY_SUBJECT_NAME_STRATEGY));
+        putConfig(AbstractKafkaSchemaSerDeConfig.VALUE_SUBJECT_NAME_STRATEGY, properties.getProperty(Constants.VALUE_SUBJECT_NAME_STRATEGY));
     }
 
     /**

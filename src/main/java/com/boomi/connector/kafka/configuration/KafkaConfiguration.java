@@ -59,9 +59,9 @@ public abstract class KafkaConfiguration<T extends AbstractConfig> implements Co
         setMaxRequestSize(_maxRequestSize, _configs);
 
         if (Objects.equals(_avroType, "2")) {
-            setSerializationWithMessageAndKey(_configs, connection.getKeyStrategy(), connection.getMessageStrategy());
+            setSerializationWithMessageAndKey(_configs);
         } else if (Objects.equals(_avroType, "1")) {
-            setSerializationWithMessage(_configs, connection.getMessageStrategy());
+            setSerializationWithMessage(_configs);
         } else {
             setSerialization(_configs);
         }
@@ -74,23 +74,22 @@ public abstract class KafkaConfiguration<T extends AbstractConfig> implements Co
         configs.put(ProducerConfig.BATCH_SIZE_CONFIG, maxRequestSize);
         configs.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, maxRequestSize);
         configs.put(ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG, maxRequestSize);
+        //configs.put(AbstractKafkaSchemaSerDeConfig.KEY_SUBJECT_NAME_STRATEGY, _keyStrategy);
+        //configs.put(AbstractKafkaSchemaSerDeConfig.VALUE_SUBJECT_NAME_STRATEGY, _messageStrategy);
     }
 
-    private static void setSerializationWithMessage(Map<String, Object> configs, String _messageStrategy) {
+    private static void setSerializationWithMessage(Map<String, Object> configs) {
         configs.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getTypeName());
         configs.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class.getTypeName());
         configs.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getTypeName());
         configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getTypeName());
-        configs.put(AbstractKafkaSchemaSerDeConfig.VALUE_SUBJECT_NAME_STRATEGY, _messageStrategy);
     }
 
-    private static void setSerializationWithMessageAndKey(Map<String, Object> configs, String _keyStrategy, String _messageStrategy) {
+    private static void setSerializationWithMessageAndKey(Map<String, Object> configs) {
         configs.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class.getTypeName());
         configs.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class.getTypeName());
         configs.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getTypeName());
         configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getTypeName());
-        configs.put(AbstractKafkaSchemaSerDeConfig.KEY_SUBJECT_NAME_STRATEGY, _keyStrategy);
-        configs.put(AbstractKafkaSchemaSerDeConfig.VALUE_SUBJECT_NAME_STRATEGY, _messageStrategy);
     }
 
     private static void setSerialization(Map<String, Object> configs) {

@@ -4,6 +4,9 @@ package com.boomi.connector.kafka.operation.produce;
 import com.boomi.connector.api.ConnectorException;
 import com.boomi.connector.api.ObjectData;
 import com.boomi.connector.api.OperationResponse;
+import com.boomi.connector.api.OperationStatus;
+import com.boomi.connector.api.PayloadUtil;
+import com.boomi.connector.api.PropertyMap;
 import com.boomi.connector.api.ResponseUtil;
 import com.boomi.connector.api.UpdateRequest;
 import com.boomi.connector.kafka.exception.InvalidMessageSizeException;
@@ -57,13 +60,17 @@ public class ProduceOperation extends BaseUpdateOperation {
     @Override
     protected void executeUpdate(UpdateRequest updateRequest, OperationResponse response) {
         BoomiProducer producer = null;
+        PropertyMap property = getConnection().getContext().getOperationProperties();
 
         try {
-            int a = 1 + 1 + 1;
+            int a = 1+1+2+1+1;
+            int b = a + 3;// prevent Boomi error by updating these line
             producer = getConnection().createProducer();
             for (ObjectData data : updateRequest) {
-                process(producer, data, response, getConnection().getSchemaKey(), getConnection().getSchemaMessage());
+                process(producer, data, response, property.getProperty(Constants.AVRO_SCHEMA_KEY), property.getProperty(Constants.AVRO_SCHEMA_MESSAGE));
             }
+            //process(producer, data, response, getConnection().getSchemaKey(), getConnection().getSchemaMessage());
+
         } catch (InterruptedException e) {
             // mark pending documents as Failure
             ResponseUtil.addExceptionFailures(response, updateRequest, e);
@@ -92,17 +99,15 @@ public class ProduceOperation extends BaseUpdateOperation {
         ProduceMessage message = null;
         try {
             message = new ProduceMessage(data, _topic, producer.getMaxRequestSize());
-            LOG.fine("1");
+            //TODO: beautify this
             if (!schemaKey.isBlank()) {
-                LOG.fine("2");
                 producer.sendMessage(message.toAvroMessageAndKeyRecord(schemaKey, schemaMessage));
-                LOG.fine("3");
             } else if (!schemaMessage.isBlank()){
                 producer.sendMessage(message.toAvroMessageRecord(schemaMessage));
             } else {
                 producer.sendMessage(message.toRecord());
             }
-            ResponseUtil.addEmptySuccess(response, data, Constants.CODE_SUCCESS);
+            ResponseUtil.addSuccess(response, data, Constants.CODE_SUCCESS);
         } catch (InvalidMessageSizeException e) {
             ResultUtil.addApplicationError(data, response, Constants.CODE_INVALID_SIZE, e.getMessage(), e);
         } catch (TimeoutException e) {

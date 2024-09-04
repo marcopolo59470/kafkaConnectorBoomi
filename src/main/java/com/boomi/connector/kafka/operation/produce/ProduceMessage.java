@@ -18,6 +18,7 @@ import org.apache.kafka.common.header.internals.RecordHeader;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.Collections;
@@ -40,8 +41,6 @@ public class ProduceMessage implements Closeable {
     private final String _topic;
     private final Iterable<Header> _headers;
     private final Integer _partitionId;
-    private AvroMapper avroMessageMapper;
-
 
     /**
      * Construct a new instance of {@link ProduceMessage} from the given {@link ObjectData}.
@@ -171,17 +170,21 @@ public class ProduceMessage implements Closeable {
     }
 
     ProducerRecord<String, GenericData.Record> toAvroMessageRecord(String schemaMessage) throws IOException {
-        this.avroMessageMapper = new AvroMapper(schemaMessage);
-        return new ProducerRecord<>(_topic, _partitionId, _key, avroMessageMapper.toAvroRecord(_payload.toString()), _headers);
+        AvroMapper avroMessageMapper = new AvroMapper(translateEscapes(schemaMessage));
+        String messageString = convertInputStreamToString(_payload.getInputStream());
+        GenericData.Record message = avroMessageMapper.toAvroRecord(translateEscapes(messageString));
+        return new ProducerRecord<>(_topic, _partitionId, _key, message, _headers);
     }
 
     ProducerRecord<GenericData.Record, GenericData.Record> toAvroMessageAndKeyRecord(String schemaKey, String schemaMessage) throws IOException {
         AvroMapper avroKeyMapper = new AvroMapper(translateEscapes(schemaKey));
-        this.avroMessageMapper = new AvroMapper(translateEscapes(schemaMessage));
+        AvroMapper avroMessageMapper = new AvroMapper(translateEscapes(schemaMessage));
+        String messageString = convertInputStreamToString(_payload.getInputStream());
         GenericData.Record key = avroKeyMapper.toAvroRecord(_key);
-        GenericData.Record message = avroMessageMapper.toAvroRecord(convertInputStreamToString(_payload.getInputStream()));
-        throw new ConnectorException("p/ " + message + "   k/ " + key);
-        //return new ProducerRecord<>(_topic, _partitionId, key, message, _headers);
+
+        GenericData.Record message = avroMessageMapper.toAvroRecord(messageString);
+        //throw new ConnectorException("p/ " + message + "   k/ " + key);
+        return new ProducerRecord<>(_topic, _partitionId, key, message, _headers);
     }
 
     /**

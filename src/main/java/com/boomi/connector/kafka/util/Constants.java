@@ -39,6 +39,10 @@ public final class Constants {
     public static final String KEY_ACKS = "acks";
     public static final String KEY_MAXIMUM_TIME_TO_WAIT = "operation_timeout";
     public static final String KEY_ALLOW_DYNAMIC_TOPIC = "allow_dynamic_topics";
+    public static final String AVRO_SCHEMA_KEY = "avro.schema.key";
+    public static final String AVRO_SCHEMA_MESSAGE = "avro.schema.message";
+    public static final String KEY_SUBJECT_NAME_STRATEGY = "key.subject.name.strategy";
+    public static final String VALUE_SUBJECT_NAME_STRATEGY = "value.subject.name.strategy";
 
     // consumer & commit offset
     public static final String KEY_CONSUMER_GROUP = "consumer_group";
@@ -59,10 +63,8 @@ public final class Constants {
     public static final String KEY_SINGLETON_LISTENER = "is_singleton";
     public static final String KEY_ASSIGN_PARTITIONS = "assign_partitions";
     public static final String KEY_PARTITION_IDS = "partition_ids";
-    public static final String AVRO_SCHEMA_KEY = "avro.schema.key";
-    public static final String KEY_SUBJECT_NAME_STRATEGY = "key.subject.name.strategy";
-    public static final String VALUE_SUBJECT_NAME_STRATEGY = "value.subject.name.strategy";
-    public static final String AVRO_SCHEMA_MESSAGE = "avro.schema.message";
+
+
 
 
     // 10 seconds

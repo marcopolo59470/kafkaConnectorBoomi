@@ -27,6 +27,8 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeSet;
 
+import static com.boomi.connector.kafka.util.Tools.defaultValueIfNullOrBlank;
+
 /**
  * Browser implementation that includes a testConnection method that asserts the connection with Kafka performing a
  * request to retrieve the available Topics
@@ -123,6 +125,7 @@ public class KafkaBrowser extends BaseBrowser implements ConnectionTester {
         return getContext().getOperationProperties().getBooleanProperty(
                 Constants.KEY_ALLOW_DYNAMIC_TOPIC, false);
     }
+
 
     /**
      * Builds and fills an {@link ObjectTypes} with all the Topic fetch from Kafka. The topics are ordered

@@ -68,13 +68,6 @@ public class KafkaConnection<C extends ConnectorContext> extends BaseConnection<
         return DEFAULT_CLIENT_ID;
     }
 
-    public String getSchemaKey() {
-        return defaultValueIfNullOrBlank(getContext().getConnectionProperties().getProperty(Constants.AVRO_SCHEMA_KEY), "");
-    }
-
-    public String getSchemaMessage() {
-        return defaultValueIfNullOrBlank(getContext().getConnectionProperties().getProperty(Constants.AVRO_SCHEMA_MESSAGE), "");
-    }
 
     public String getKeyStrategy() {
         return getContext().getConnectionProperties().getProperty(Constants.KEY_SUBJECT_NAME_STRATEGY);
