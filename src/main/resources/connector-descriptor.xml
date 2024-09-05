@@ -420,6 +420,23 @@
             </visibilityCondition>
         </field>
 
+        <field id="is_regex_topic" label="consume matching topics" type="boolean">
+            <helpText>
+                Choose whether to consume all topics that match a regex or not.
+            </helpText>
+            <defaultValue>false</defaultValue>
+        </field>
+        <field id="regex_topic_value" label="enter the pattern" type="string">
+            <helpText>
+                Enter the regex that will be used as the pattern.
+            </helpText>
+            <visibilityCondition>
+                <valueCondition fieldId="is_regex_topic">
+                    <value>true</value>
+                </valueCondition>
+            </visibilityCondition>
+        </field>
+
         <field id="allow_dynamic_topics" label="Allow Dynamic Topics" type="boolean" scope="browseOnly">
             <helpText>
                 Select to display Dynamic Topic as the single option available in the list of Object Types and
@@ -546,6 +563,23 @@
             </helpText>
             <visibilityCondition>
                 <valueCondition fieldId="assign_partitions">
+                    <value>true</value>
+                </valueCondition>
+            </visibilityCondition>
+        </field>
+
+        <field id="is_regex_topic" label="consume matching topics" type="boolean">
+            <helpText>
+                Choose whether to consume all topics that match a regex or not.
+            </helpText>
+            <defaultValue>false</defaultValue>
+        </field>
+        <field id="regex_topic_value" label="enter the pattern" type="string">
+            <helpText>
+                Enter the regex that will be used as the pattern.
+            </helpText>
+            <visibilityCondition>
+                <valueCondition fieldId="is_regex_topic">
                     <value>true</value>
                 </valueCondition>
             </visibilityCondition>

@@ -1,4 +1,3 @@
-// Copyright (c) 2022 Boomi, Inc.
 package com.boomi.connector.kafka.operation.consume;
 
 import com.boomi.connector.kafka.client.consumer.BoomiCustomConsumer;
@@ -8,6 +7,7 @@ import org.apache.kafka.common.TopicPartition;
 
 import java.util.Collection;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 
 /**
  * Factory class responsible for creating a supplier for {@link BoomiCustomConsumer}, and subscribe to a specific topic,
@@ -49,6 +49,14 @@ public final class BoomiCustomConsumerSupplierFactory {
         return () -> {
             BoomiCustomConsumer consumer = new BoomiCustomConsumer(config);
             consumer.subscribe(topic);
+            return consumer;
+        };
+    }
+
+    public static Supplier<BoomiCustomConsumer> createSupplierRegex(ConsumerConfiguration config, String regex) {
+        return () -> {
+            BoomiCustomConsumer consumer = new BoomiCustomConsumer(config);
+            consumer.subscribeWithPattern(Pattern.compile(regex));
             return consumer;
         };
     }

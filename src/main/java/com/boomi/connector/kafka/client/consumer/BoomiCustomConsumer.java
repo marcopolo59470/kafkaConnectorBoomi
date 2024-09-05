@@ -3,20 +3,16 @@ package com.boomi.connector.kafka.client.consumer;
 import com.boomi.connector.kafka.operation.commit.Committable;
 import com.boomi.util.CollectionUtil;
 
-
-import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.KafkaException;
 import org.apache.kafka.common.TopicPartition;
-import org.apache.kafka.common.serialization.Deserializer;
-import org.apache.kafka.common.utils.Utils;
 
 import java.io.InputStream;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Properties;
+import java.util.regex.Pattern;
 
 /**
  * An extension of {@link KafkaConsumer} with custom method overloads.
@@ -76,6 +72,16 @@ public class BoomiCustomConsumer extends KafkaConsumer<Object, InputStream> {
      */
     public void subscribe(String topic) {
         subscribe(Collections.singleton(topic));
+    }
+
+    /**
+     * Subscribe to the topics matching Pattern.
+     *
+     * @param topic
+     *         to subscribe to.
+     */
+    public void subscribeWithPattern(Pattern pattern) {
+        subscribe(pattern);
     }
 
     /**

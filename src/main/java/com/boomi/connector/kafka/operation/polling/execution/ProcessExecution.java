@@ -1,4 +1,3 @@
-// Copyright (c) 2020 Boomi, Inc.
 package com.boomi.connector.kafka.operation.polling.execution;
 
 import com.boomi.connector.api.ConnectorException;

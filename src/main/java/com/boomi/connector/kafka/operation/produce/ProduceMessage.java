@@ -1,4 +1,3 @@
-
 package com.boomi.connector.kafka.operation.produce;
 
 import com.boomi.connector.api.ConnectorException;
@@ -18,7 +17,6 @@ import org.apache.kafka.common.header.internals.RecordHeader;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.Collections;

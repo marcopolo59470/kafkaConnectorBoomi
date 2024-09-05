@@ -1,4 +1,3 @@
-// Copyright (c) 2023 Boomi, Inc.
 package com.boomi.connector.kafka.util;
 
 import com.boomi.connector.api.BrowseContext;

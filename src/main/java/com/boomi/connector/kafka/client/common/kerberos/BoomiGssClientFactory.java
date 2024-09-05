@@ -1,4 +1,3 @@
-// Copyright (c) 2019 Boomi, Inc.
 package com.boomi.connector.kafka.client.common.kerberos;
 
 import com.boomi.connector.api.ConnectorException;

@@ -1,4 +1,3 @@
-
 package com.boomi.connector.kafka.operation;
 
 import com.boomi.connector.api.BrowseContext;

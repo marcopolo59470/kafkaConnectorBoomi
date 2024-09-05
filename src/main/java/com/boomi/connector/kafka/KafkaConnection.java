@@ -3,11 +3,9 @@ package com.boomi.connector.kafka;
 import com.boomi.connector.api.AtomConfig;
 import com.boomi.connector.api.ConnectorContext;
 import com.boomi.connector.api.ConnectorException;
-import com.boomi.connector.api.PrivateKeyStore;
 import com.boomi.connector.kafka.client.consumer.BoomiCustomConsumer;
 import com.boomi.connector.kafka.client.consumer.ConsumerConfiguration;
 import com.boomi.connector.kafka.configuration.Credentials;
-import com.boomi.connector.kafka.configuration.SSLContextFactory;
 import com.boomi.connector.kafka.util.AvroMode;
 import com.boomi.connector.kafka.util.Constants;
 import com.boomi.connector.util.BaseConnection;
@@ -15,11 +13,9 @@ import com.boomi.util.IOUtil;
 import com.boomi.util.LogUtil;
 import com.boomi.util.NumberUtil;
 
-import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.common.network.InvalidReceiveException;
 
-import javax.net.ssl.SSLContext;
 import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.Set;

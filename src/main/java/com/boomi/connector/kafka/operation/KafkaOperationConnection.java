@@ -1,4 +1,3 @@
-// Copyright (c) 2020 Boomi, Inc.
 package com.boomi.connector.kafka.operation;
 
 import com.boomi.connector.api.ConnectorException;
@@ -35,14 +34,19 @@ public class KafkaOperationConnection extends KafkaConnection<OperationContext> 
     }
 
     /**
-     * Create a {@link BoomiConsumer} and subscribe to the given topic. If {@link #isAssignPartitions()} is set, a
-     * {@link BoomiConsumer} is returned with the assigned partitions.
+     * Create a {@link BoomiConsumer} and subscribe to the given topic or pattern matching topic.
+     * If {@link #isAssignPartitions()} is set, a {@link BoomiConsumer} is returned with the assigned partitions.
+     * If {@link #isRegexTopic()} is set, a {@link BoomiConsumer} is returned with matching topics.
      *
      * @param topic
      *         to subscribe
      * @return a new {@link BoomiConsumer}
      */
     public BoomiConsumer createConsumer(String topic) {
+        if (isRegexTopic()){
+            return new BoomiConsumer(createSupplierRegex(regexTopicValue()));
+        }
+
         Supplier<BoomiCustomConsumer> supplier = isAssignPartitions() ? createSupplier(topic, getPartitionsIds())
                 : createSupplier(topic);
         return new BoomiConsumer(supplier);
@@ -57,6 +61,7 @@ public class KafkaOperationConnection extends KafkaConnection<OperationContext> 
      *         identifiers to be assigned to the given topic
      * @return a new {@link Supplier}
      */
+
     protected Supplier<BoomiCustomConsumer> createSupplier(String topic, String partitions) {
         return BoomiCustomConsumerSupplierFactory.createSupplier(ConsumerConfiguration.consumer(this),
                 PartitionUtil.createTopicPartition(topic, partitions));
@@ -71,6 +76,10 @@ public class KafkaOperationConnection extends KafkaConnection<OperationContext> 
      */
     protected Supplier<BoomiCustomConsumer> createSupplier(String topic) {
         return BoomiCustomConsumerSupplierFactory.createSupplier(ConsumerConfiguration.consumer(this), topic);
+    }
+
+    protected Supplier<BoomiCustomConsumer> createSupplierRegex(String regex) {
+        return BoomiCustomConsumerSupplierFactory.createSupplierRegex(ConsumerConfiguration.consumer(this), regex);
     }
 
     public BoomiCommitter createCommitter() {
@@ -95,6 +104,14 @@ public class KafkaOperationConnection extends KafkaConnection<OperationContext> 
      */
     protected boolean isAssignPartitions() {
         return getContext().getOperationProperties().getBooleanProperty(Constants.KEY_ASSIGN_PARTITIONS, false);
+    }
+
+    protected boolean isRegexTopic() {
+        return getContext().getOperationProperties().getBooleanProperty(Constants.KEY_IS_REGEX_TOPIC, false);
+    }
+
+    protected String regexTopicValue() {
+        return getContext().getOperationProperties().getProperty(Constants.KEY_REGEX_TOPIC_VALUE, "EMPTY_REGEX");
     }
 
     /**

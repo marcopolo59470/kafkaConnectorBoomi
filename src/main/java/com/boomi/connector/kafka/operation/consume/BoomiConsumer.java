@@ -1,4 +1,3 @@
-
 package com.boomi.connector.kafka.operation.consume;
 
 import com.boomi.connector.kafka.client.consumer.BoomiCustomConsumer;

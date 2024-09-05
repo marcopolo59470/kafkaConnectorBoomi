@@ -16,18 +16,12 @@ import com.boomi.connector.kafka.util.Constants;
 import com.boomi.connector.util.BaseBrowser;
 import com.boomi.util.json.JSONUtil;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeSet;
-
-import static com.boomi.connector.kafka.util.Tools.defaultValueIfNullOrBlank;
 
 /**
  * Browser implementation that includes a testConnection method that asserts the connection with Kafka performing a

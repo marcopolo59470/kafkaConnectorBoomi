@@ -1,17 +1,13 @@
-
 package com.boomi.connector.kafka.operation.produce;
 
 import com.boomi.connector.api.ConnectorException;
 import com.boomi.connector.api.ObjectData;
 import com.boomi.connector.api.OperationResponse;
-import com.boomi.connector.api.OperationStatus;
-import com.boomi.connector.api.PayloadUtil;
 import com.boomi.connector.api.PropertyMap;
 import com.boomi.connector.api.ResponseUtil;
 import com.boomi.connector.api.UpdateRequest;
 import com.boomi.connector.kafka.exception.InvalidMessageSizeException;
 import com.boomi.connector.kafka.operation.KafkaOperationConnection;
-import com.boomi.connector.kafka.operation.polling.KafkaPollingOperation;
 import com.boomi.connector.kafka.util.Constants;
 import com.boomi.connector.kafka.util.ErrorCodeHelper;
 import com.boomi.connector.kafka.util.ResultUtil;
@@ -23,7 +19,6 @@ import com.boomi.util.LogUtil;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**

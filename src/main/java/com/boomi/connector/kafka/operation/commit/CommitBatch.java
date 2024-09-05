@@ -1,4 +1,3 @@
-
 package com.boomi.connector.kafka.operation.commit;
 
 import com.boomi.connector.api.ObjectData;

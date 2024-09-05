@@ -1,7 +1,6 @@
 package com.boomi.connector.kafka.configuration;
 
 import com.boomi.connector.api.ConnectorContext;
-import com.boomi.connector.api.ConnectorException;
 import com.boomi.connector.kafka.KafkaConnection;
 import com.boomi.connector.kafka.client.common.kerberos.KerberosTicketCache;
 import com.boomi.connector.kafka.client.common.kerberos.KerberosTicketKey;
@@ -12,7 +11,6 @@ import com.boomi.connector.util.ConnectorCache;
 import com.boomi.connector.util.ConnectorCacheFactory;
 import com.boomi.util.ByteUnit;
 
-import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import org.apache.kafka.clients.CommonClientConfigs;

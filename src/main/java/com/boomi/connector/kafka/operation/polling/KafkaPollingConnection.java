@@ -1,16 +1,12 @@
-// Copyright (c) 2020 Boomi, Inc.
 package com.boomi.connector.kafka.operation.polling;
 
 import com.boomi.connector.api.ConnectorException;
 import com.boomi.connector.api.OperationContext;
-import com.boomi.connector.api.PrivateKeyStore;
 import com.boomi.connector.kafka.client.consumer.BoomiCustomConsumer;
-import com.boomi.connector.kafka.configuration.SSLContextFactory;
 import com.boomi.connector.kafka.operation.KafkaOperationConnection;
 import com.boomi.connector.kafka.util.Constants;
 import com.boomi.util.NumberUtil;
 
-import javax.net.ssl.SSLContext;
 import java.util.function.Supplier;
 
 /**
@@ -24,6 +20,10 @@ public class KafkaPollingConnection extends KafkaOperationConnection {
     }
 
     BoomiListenerConsumer createPollingConsumer(String topic) {
+        if (isRegexTopic()){
+            return new BoomiListenerConsumer(createSupplierRegex(regexTopicValue()));
+        }
+
         Supplier<BoomiCustomConsumer> supplier = isAssignPartitions() ? createSupplier(topic, getPartitionsIds())
                 : createSupplier(topic);
         return new BoomiListenerConsumer(supplier);

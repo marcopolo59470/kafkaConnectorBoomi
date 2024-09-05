@@ -4,7 +4,6 @@ import com.boomi.connector.api.Payload;
 import com.boomi.connector.api.PayloadMetadata;
 import com.boomi.connector.api.PayloadUtil;
 import com.boomi.connector.kafka.operation.commit.Committable;
-import com.boomi.connector.kafka.operation.polling.BoomiListenerConsumer;
 import com.boomi.connector.kafka.util.Constants;
 import com.boomi.util.IOUtil;
 import com.boomi.util.LogUtil;

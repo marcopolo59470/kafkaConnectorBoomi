@@ -1,4 +1,3 @@
-// Copyright (c) 2019 Boomi, Inc.
 package com.boomi.connector.kafka.client.common.security;
 
 import javax.net.ssl.SSLContext;

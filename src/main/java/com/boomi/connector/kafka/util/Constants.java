@@ -1,4 +1,3 @@
-
 package com.boomi.connector.kafka.util;
 
 import com.boomi.util.ByteUnit;
@@ -63,8 +62,8 @@ public final class Constants {
     public static final String KEY_SINGLETON_LISTENER = "is_singleton";
     public static final String KEY_ASSIGN_PARTITIONS = "assign_partitions";
     public static final String KEY_PARTITION_IDS = "partition_ids";
-
-
+    public static final String KEY_IS_REGEX_TOPIC = "is_regex_topic";
+    public static final String KEY_REGEX_TOPIC_VALUE = "regex_topic_value";
 
 
     // 10 seconds

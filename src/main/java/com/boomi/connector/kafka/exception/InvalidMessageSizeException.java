@@ -1,4 +1,3 @@
-
 package com.boomi.connector.kafka.exception;
 
 /**

@@ -1,6 +1,5 @@
 package com.boomi.connector.kafka.operation.produce;
 
-import com.boomi.connector.api.ConnectorException;
 import com.boomi.connector.kafka.client.producer.BoomiCustomProducer;
 import com.boomi.connector.kafka.client.producer.ProducerConfiguration;
 import com.boomi.util.IOUtil;
