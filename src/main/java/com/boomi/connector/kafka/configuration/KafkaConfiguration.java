@@ -1,6 +1,7 @@
 package com.boomi.connector.kafka.configuration;
 
 import com.boomi.connector.api.ConnectorContext;
+import com.boomi.connector.api.PropertyMap;
 import com.boomi.connector.kafka.KafkaConnection;
 import com.boomi.connector.kafka.client.common.kerberos.KerberosTicketCache;
 import com.boomi.connector.kafka.client.common.kerberos.KerberosTicketKey;
@@ -38,6 +39,9 @@ public abstract class KafkaConfiguration<T extends AbstractConfig> implements Co
 
     protected static final int DEFAULT_TIMEOUT = 30 * 1000;
 
+    private static final int DEFAULT_SESSION_TIMEOUT = 120000;
+    private static final int DEFAULT_INTERVAL_HEARTBEAT = 50000;
+
     private final Map<String, Object> _configs;
     private final Credentials _credentials;
     private final int _maxRequestSize;
@@ -46,14 +50,15 @@ public abstract class KafkaConfiguration<T extends AbstractConfig> implements Co
     private final String _avroType;
 
     protected KafkaConfiguration(KafkaConnection<? extends ConnectorContext> connection) {
+
         _context = connection.getContext();
         _credentials = Objects.requireNonNull(connection.getCredentials());
         _configs = buildBaseConfiguration(connection.getBootstrapServers(), connection.getSchemaRegistry(), connection.getBasicAuth(), connection.getBasicSource());
         _maxRequestSize = connection.getMaxRequestSize();
         _clientId = connection.getClientId();
         //TODO: change this
-        _avroType = connection.getAvroType().getCode();
-
+        //_avroType = connection.getAvroType().getCode();
+        _avroType = propertyMap
         setMaxRequestSize(_maxRequestSize, _configs);
 
         if (Objects.equals(_avroType, "2")) {
@@ -70,6 +75,8 @@ public abstract class KafkaConfiguration<T extends AbstractConfig> implements Co
     private static void setMaxRequestSize(int maxRequestSize, Map<String, Object> configs) {
         configs.put(ProducerConfig.MAX_REQUEST_SIZE_CONFIG, maxRequestSize);
         configs.put(ProducerConfig.BATCH_SIZE_CONFIG, maxRequestSize);
+        configs.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, DEFAULT_SESSION_TIMEOUT);
+        configs.put(ConsumerConfig.HEARTBEAT_INTERVAL_MS_CONFIG, DEFAULT_INTERVAL_HEARTBEAT);
         configs.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, maxRequestSize);
         configs.put(ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG, maxRequestSize);
         //configs.put(AbstractKafkaSchemaSerDeConfig.KEY_SUBJECT_NAME_STRATEGY, _keyStrategy);

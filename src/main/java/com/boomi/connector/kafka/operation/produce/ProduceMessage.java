@@ -148,14 +148,15 @@ public class ProduceMessage implements Closeable {
         if (!isDynamicTopic) {
             return topic;
         }
-
+int a = 1+1;
+        int b= a+1;
         String overriddenTopic = data.getDynamicProperties().get(Constants.KEY_TOPIC_NAME);
+        throw new ConnectorException(topic + " : " + Constants.DYNAMIC_TOPIC_ID + " : " + overriddenTopic);
 
-        if (StringUtil.isBlank(overriddenTopic)) {
+        /**if (StringUtil.isBlank(overriddenTopic)) {
             throw new ConnectorException("undefined topic");
         }
-
-        return overriddenTopic;
+        return overriddenTopic;*/
     }
 
     /**

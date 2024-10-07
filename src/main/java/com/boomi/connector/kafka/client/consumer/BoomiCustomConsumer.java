@@ -77,8 +77,8 @@ public class BoomiCustomConsumer extends KafkaConsumer<Object, InputStream> {
     /**
      * Subscribe to the topics matching Pattern.
      *
-     * @param topic
-     *         to subscribe to.
+     * @param pattern used to search matching topics
+     *
      */
     public void subscribeWithPattern(Pattern pattern) {
         subscribe(pattern);

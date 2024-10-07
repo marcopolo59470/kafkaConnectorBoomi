@@ -8,6 +8,7 @@ import com.boomi.connector.api.ResponseUtil;
 import com.boomi.connector.api.UpdateRequest;
 import com.boomi.connector.kafka.exception.InvalidMessageSizeException;
 import com.boomi.connector.kafka.operation.KafkaOperationConnection;
+import com.boomi.connector.kafka.util.AvroMode;
 import com.boomi.connector.kafka.util.Constants;
 import com.boomi.connector.kafka.util.ErrorCodeHelper;
 import com.boomi.connector.kafka.util.ResultUtil;
@@ -58,8 +59,9 @@ public class ProduceOperation extends BaseUpdateOperation {
         PropertyMap property = getConnection().getContext().getOperationProperties();
 
         try {
-            int a = 1+1+2+1+1;
-            int b = a + 3;// prevent Boomi error by updating these line
+            int a = 1+1+1;
+                    int b=1+a;// prevent Boomi error by updating these line
+
             producer = getConnection().createProducer();
             for (ObjectData data : updateRequest) {
                 process(producer, data, response, property.getProperty(Constants.AVRO_SCHEMA_KEY), property.getProperty(Constants.AVRO_SCHEMA_MESSAGE));

@@ -334,7 +334,7 @@
             <defaultValue>false</defaultValue>
         </field>
 
-        <field id="topic_name" label="Topic Name" type="string" scope="browseOnly">
+        <field id="topic_name" label="Topic Name" type="string" scope="browseOnly" overrideable="true">
             <helpText>
                 Enter the topic name to indicate where the message is published.
             </helpText>
@@ -445,7 +445,7 @@
             <defaultValue>false</defaultValue>
         </field>
 
-        <field id="topic_name" label="Topic Name" type="string" scope="browseOnly">
+        <field id="topic_name" label="Topic Name" type="string" scope="browseOnly" overrideable="true">
             <helpText>
                 Enter the topic name to indicate where the messages are consumed from.
             </helpText>
@@ -480,7 +480,7 @@
             <defaultValue>false</defaultValue>
         </field>
 
-        <field id="topic_name" label="Topic Name" type="string" scope="browseOnly">
+        <field id="topic_name" label="Topic Name" type="string" scope="browseOnly" overrideable="true">
             <helpText>
                 Enter the topic name to indicate where the message is committed.
             </helpText>
@@ -593,7 +593,7 @@
             <defaultValue>false</defaultValue>
         </field>
 
-        <field id="topic_name" label="Topic Name" type="string" scope="browseOnly">
+        <field id="topic_name" label="Topic Name" type="string" scope="browseOnly" overrideable="true">
             <helpText>
                 Enter the topic name you want to pull messages from into your process.
             </helpText>

@@ -61,6 +61,8 @@ public class ConsumeOperation extends BaseUpdateOperation {
 
     @Override
     protected void executeUpdate(UpdateRequest request, OperationResponse response) {
+        int a = 1+1;// prevent Boomi error by updating these line
+        int b = a+1;
         ConsumeResponseHandler responseHandler = new ConsumeResponseHandler(request, response);
 
         BoomiConsumer consumer = null;

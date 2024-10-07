@@ -73,12 +73,12 @@ public class KafkaConnection<C extends ConnectorContext> extends BaseConnection<
         return getContext().getConnectionProperties().getProperty(Constants.VALUE_SUBJECT_NAME_STRATEGY);
     }
 
-    public AvroMode getAvroType() {
+    /**public AvroMode getAvroType() {
         String mode = getContext().getConnectionProperties().getProperty(Constants.KEY_AVRO_MODE);
 
         //LOG.log(Level.INFO, AvroMode.getByCode(mode).toString());
         return (mode == null || mode.isEmpty()) ? AvroMode.NO_MESSAGE : AvroMode.getByCode(mode);
-    }
+    }*/
     public Credentials getCredentials() {
         return _credentials;
     }

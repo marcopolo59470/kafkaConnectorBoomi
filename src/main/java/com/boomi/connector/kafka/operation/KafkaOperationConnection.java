@@ -78,6 +78,12 @@ public class KafkaOperationConnection extends KafkaConnection<OperationContext> 
         return BoomiCustomConsumerSupplierFactory.createSupplier(ConsumerConfiguration.consumer(this), topic);
     }
 
+    /**
+     * Create a {@link Supplier} of {@link BoomiCustomConsumer} with the given topic.
+     *
+     * @param regex
+     * @return a new {@link Supplier}
+     */
     protected Supplier<BoomiCustomConsumer> createSupplierRegex(String regex) {
         return BoomiCustomConsumerSupplierFactory.createSupplierRegex(ConsumerConfiguration.consumer(this), regex);
     }

@@ -21,6 +21,8 @@ public final class TopicNameUtil {
      * @return topic name
      */
     public static String getTopic(String operationId, BrowseContext context) {
+        //LOG
+
 
         String topicName = Constants.DYNAMIC_TOPIC_ID.equals(operationId) ?
                 context.getOperationProperties().getProperty(Constants.TOPIC_NAME_FIELD_ID) : operationId;
