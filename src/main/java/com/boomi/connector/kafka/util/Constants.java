@@ -53,9 +53,9 @@ public final class Constants {
 
     // consumer & listen
     public static final String KEY_AUTO_OFFSET_RESET = "auto_offset_reset";
+    public static final String KEY_CERTIFICATE_OPERATION = "private_certificate_operation";
 
     // listen
-    //public static final String KEY_CERTIFICATE_OPERATION = "private_certificate_operation";
     public static final String KEY_POLLING_INTERVAL = "polling_interval";
     public static final String KEY_MAX_MESSAGES = "max_messages_poll";
     public static final String KEY_POLLING_DELAY = "polling_delay";

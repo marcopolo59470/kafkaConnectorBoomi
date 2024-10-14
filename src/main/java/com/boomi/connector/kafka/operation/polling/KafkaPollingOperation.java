@@ -53,7 +53,7 @@ public class KafkaPollingOperation extends UnmanagedListenOperation
     }
 
     private KafkaPollingOperation(KafkaPollingConnection connection, String operationId) {
-        this(connection, connection.createPollingConsumer(
+        this(connection, connection.createPollingConsumer(null,
                         TopicNameUtil.getTopic(connection.getObjectTypeId(), connection.getContext())),
                 ExecutorUtil.newScheduler(operationId));
     }

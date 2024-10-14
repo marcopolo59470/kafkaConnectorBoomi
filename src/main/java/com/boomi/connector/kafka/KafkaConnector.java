@@ -43,8 +43,6 @@ public class KafkaConnector extends UnmanagedListenConnector {
         CustomOperationType operationType = CustomOperationType.fromContext(context);
         KafkaOperationConnection connection = new KafkaOperationConnection(context);
 
-        String avroMode = getAvroType(connection).getCode();
-
         switch (operationType) {
             case PRODUCE:
                 return new ProduceOperation(connection);
@@ -57,12 +55,7 @@ public class KafkaConnector extends UnmanagedListenConnector {
         }
     }
 
-    public AvroMode getAvroType(KafkaOperationConnection connection) {
-        String mode = connection.getContext().getOperationProperties().getProperty(Constants.KEY_AVRO_MODE);
 
-        //LOG.log(Level.INFO, AvroMode.getByCode(mode).toString());
-        return (mode == null || mode.isEmpty()) ? AvroMode.NO_MESSAGE : AvroMode.getByCode(mode);
-    }
     @Override
     public UnmanagedListenOperation createListenOperation(OperationContext context) {
         return new KafkaPollingOperation(new KafkaPollingConnection(context));

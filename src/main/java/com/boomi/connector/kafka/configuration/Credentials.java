@@ -29,7 +29,6 @@ public class Credentials {
 
     public Credentials(ConnectorContext context) {
         PropertyMap connectionProperties = context.getConnectionProperties();
-
         // connection properties
 
         _securityProtocol = NumberUtil.toEnum(SecurityProtocol.class,

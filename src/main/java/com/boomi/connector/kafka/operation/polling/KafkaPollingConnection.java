@@ -19,9 +19,9 @@ public class KafkaPollingConnection extends KafkaOperationConnection {
         super(context);
     }
 
-    BoomiListenerConsumer createPollingConsumer(String topic) {
+    BoomiListenerConsumer createPollingConsumer(String dynamicRegexTopicValue, String topic) {
         if (isRegexTopic()){
-            return new BoomiListenerConsumer(createSupplierRegex(regexTopicValue()));
+            return new BoomiListenerConsumer(createSupplierRegex(regexTopicValue(dynamicRegexTopicValue)));
         }
 
         Supplier<BoomiCustomConsumer> supplier = isAssignPartitions() ? createSupplier(topic, getPartitionsIds())

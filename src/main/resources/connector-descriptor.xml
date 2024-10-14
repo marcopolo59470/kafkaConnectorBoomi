@@ -18,20 +18,6 @@
         </helpText>
     </field>
 
-    <field type="string" id="avro.mode" label="Avro mode">
-        <helpText>Choose if you want only avro message or avro key and message.</helpText>
-        <defaultValue>0</defaultValue>
-        <allowedValue label="No avro">
-            <value>0</value>
-        </allowedValue>
-        <allowedValue label="Avro message">
-            <value>1</value>
-        </allowedValue>
-        <allowedValue label="Avro key and message">
-            <value>2</value>
-        </allowedValue>
-    </field>
-
     <field id="bootstrap_servers" label="Broker List" type="string">
         <helpText>
             Enter a list of host and port pairs, separated by commas.
@@ -173,12 +159,28 @@
     <testConnection method="CUSTOM" customOperationType="TEST_CONNECTION"/>
 
     <operation types="EXECUTE" customTypeId="PRODUCE">
-
+        <field id="private_certificate_operation" label="Certificate" type="privatecertificate">
+            <helpText>(Optional) Select a private certificate component for SSL client authentication.</helpText>
+        </field>
         <field id="client_id" label="Client ID" type="string">
             <helpText>
                 Enter the unique ID used to identify the client application in Kafka. In this case, enter the ID that is
                 associated with the Kafka connector.
             </helpText>
+        </field>
+
+        <field type="string" id="avro.mode" label="Avro mode">
+            <helpText>Choose if you want only avro message or avro key and message.</helpText>
+            <defaultValue>0</defaultValue>
+            <allowedValue label="No avro">
+                <value>0</value>
+            </allowedValue>
+            <allowedValue label="Avro message">
+                <value>1</value>
+            </allowedValue>
+            <allowedValue label="Avro key and message">
+                <value>2</value>
+            </allowedValue>
         </field>
 
         <field id="key.subject.name.strategy" label="Key - AVRO schema naming strategy" type="string">
@@ -198,7 +200,12 @@
             <allowedValue label="TopicRecordNameStrategy">
                 <value>io.confluent.kafka.serializers.subject.TopicRecordNameStrategy</value>
             </allowedValue>
-
+            <visibilityCondition>
+                <valueCondition fieldId="avro.mode">
+                    <value>1</value>
+                    <value>2</value>
+                </valueCondition>
+            </visibilityCondition>
         </field>
 
         <field id="avro.schema.key" label="Key - AVRO schema declaration" type="string">
@@ -225,6 +232,12 @@
                 &lt;br&gt;
                 }
             </helpText>
+            <visibilityCondition>
+                <valueCondition fieldId="avro.mode">
+                    <value>1</value>
+                    <value>2</value>
+                </valueCondition>
+            </visibilityCondition>
         </field>
         <field id="value.subject.name.strategy" label="Message - AVRO schema naming strategy" type="string">
             <helpText>
@@ -243,6 +256,11 @@
             <allowedValue label="TopicRecordNameStrategy">
                 <value>io.confluent.kafka.serializers.subject.TopicRecordNameStrategy</value>
             </allowedValue>
+            <visibilityCondition>
+                <valueCondition fieldId="avro.mode">
+                    <value>2</value>
+                </valueCondition>
+            </visibilityCondition>
         </field>
         <field id="avro.schema.message" label="Message - AVRO schema declaration" type="string">
             <helpText>
@@ -268,6 +286,11 @@
                 &lt;br&gt;
                 }
             </helpText>
+            <visibilityCondition>
+                <valueCondition fieldId="avro.mode">
+                    <value>2</value>
+                </valueCondition>
+            </visibilityCondition>
         </field>
 
         <field id="acks" label="Acknowledgements" type="string">
@@ -348,11 +371,27 @@
 
     <operation types="EXECUTE" customTypeId="CONSUME" trackedDocument="response">
 
+        <field id="private_certificate_operation" label="Certificate" type="privatecertificate">
+            <helpText>(Optional) Select a private certificate component for SSL client authentication.</helpText>
+        </field>
         <field id="client_id" label="Client ID" type="string">
             <helpText>
                 Enter the unique ID used to identify the client application in Kafka. In this case, enter the ID that is
                 associated with the Kafka connector.
             </helpText>
+        </field>
+        <field type="string" id="avro.mode" label="Avro mode">
+            <helpText>Choose if you want only avro message or avro key and message.</helpText>
+            <defaultValue>0</defaultValue>
+            <allowedValue label="No avro">
+                <value>0</value>
+            </allowedValue>
+            <allowedValue label="Avro message">
+                <value>1</value>
+            </allowedValue>
+            <allowedValue label="Avro key and message">
+                <value>2</value>
+            </allowedValue>
         </field>
 
         <field id="consumer_group" label="Consumer Group" type="string">
@@ -494,14 +533,28 @@
     </operation>
 
     <operation types="LISTEN" customTypeId="LISTEN">
-
+        <field id="private_certificate_operation" label="Certificate" type="privatecertificate">
+            <helpText>(Optional) Select a private certificate component for SSL client authentication.</helpText>
+        </field>
         <field id="client_id" label="Client ID" type="string">
             <helpText>
                 Enter the unique ID used to identify the client application in Kafka. In this case, enter the ID that is
                 associated with the Kafka connector.
             </helpText>
         </field>
-
+        <field type="string" id="avro.mode" label="Avro mode">
+            <helpText>Choose if you want only avro message or avro key and message.</helpText>
+            <defaultValue>0</defaultValue>
+            <allowedValue label="No avro">
+                <value>0</value>
+            </allowedValue>
+            <allowedValue label="Avro message">
+                <value>1</value>
+            </allowedValue>
+            <allowedValue label="Avro key and message">
+                <value>2</value>
+            </allowedValue>
+        </field>
         <field id="consumer_group" label="Consumer Group" type="string">
             <helpText>
                 Enter the unique string that identifies the consumer group which the connector belongs to.
@@ -607,12 +660,14 @@
 
     <dynamicProperty id="message_key" label="Message Key" type="string"/>
     <dynamicProperty id="topic_name" label="Topic Name" type="string"/>
+    <dynamicProperty id="regex_topic_value" label="enter the pattern" type="string"/>
 
     <trackedProperty id="message_key" label="Message Key"/>
     <trackedProperty id="topic_name" label="Topic Name"/>
     <trackedProperty id="message_offset" label="Offset ID"/>
     <trackedProperty id="topic_partition" label="Partition ID"/>
     <trackedProperty id="message_timestamp" label="Message Timestamp"/>
+    <trackedProperty id="regex_topic_value" label="enter the pattern"/>
 
     <trackedGroup id="custom_header_properties" label="Message Headers"/>
 </GenericConnectorDescriptor>

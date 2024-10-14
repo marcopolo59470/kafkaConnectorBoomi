@@ -1,16 +1,26 @@
 package com.boomi.connector.kafka.client.producer;
 
 import com.boomi.connector.api.PropertyMap;
+import com.boomi.connector.kafka.client.common.serialization.InputStreamDeserializer;
+import com.boomi.connector.kafka.client.common.serialization.InputStreamSerializer;
 import com.boomi.connector.kafka.configuration.KafkaConfiguration;
 import com.boomi.connector.kafka.operation.KafkaOperationConnection;
+import com.boomi.connector.kafka.util.AvroMode;
 import com.boomi.connector.kafka.util.Constants;
 import com.boomi.util.LogUtil;
 
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
+import io.confluent.kafka.serializers.KafkaAvroDeserializer;
+import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import org.apache.kafka.clients.CommonClientConfigs;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.text.MessageFormat;
+import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,6 +43,7 @@ public class ProducerConfiguration extends KafkaConfiguration<ProducerConfig> {
     public ProducerConfiguration(KafkaOperationConnection connection) {
         super(connection);
         _maxWaitTimeout = getTimeout(connection);
+        String _avroType = getAvroType(connection).getCode();
         PropertyMap properties = connection.getContext().getOperationProperties();
 
         putConfig(CommonClientConfigs.REQUEST_TIMEOUT_MS_CONFIG, _maxWaitTimeout);
@@ -41,6 +52,25 @@ public class ProducerConfiguration extends KafkaConfiguration<ProducerConfig> {
         putConfig(ProducerConfig.COMPRESSION_TYPE_CONFIG, properties.getProperty(Constants.KEY_COMPRESSION_TYPE));
         putConfig(AbstractKafkaSchemaSerDeConfig.KEY_SUBJECT_NAME_STRATEGY, properties.getProperty(Constants.KEY_SUBJECT_NAME_STRATEGY));
         putConfig(AbstractKafkaSchemaSerDeConfig.VALUE_SUBJECT_NAME_STRATEGY, properties.getProperty(Constants.VALUE_SUBJECT_NAME_STRATEGY));
+
+        if (Objects.equals(_avroType, "2")) {
+            putConfig(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getTypeName());
+            putConfig(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getTypeName());
+        } else if (Objects.equals(_avroType, "1")) {
+            putConfig(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getTypeName());
+            putConfig(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getTypeName());
+        } else {
+            putConfig(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getTypeName());
+            putConfig(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, InputStreamSerializer.class.getTypeName());
+        }
+
+    }
+
+    private AvroMode getAvroType(KafkaOperationConnection connection) {
+        String mode = connection.getContext().getOperationProperties().getProperty(Constants.KEY_AVRO_MODE);
+
+        //LOG.log(Level.INFO, AvroMode.getByCode(mode).toString());
+        return (mode == null || mode.isEmpty()) ? AvroMode.NO_MESSAGE : AvroMode.getByCode(mode);
     }
 
     /**

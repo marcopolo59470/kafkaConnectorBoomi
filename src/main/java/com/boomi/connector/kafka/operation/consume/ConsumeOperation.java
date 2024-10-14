@@ -1,6 +1,7 @@
 package com.boomi.connector.kafka.operation.consume;
 
 import com.boomi.connector.api.ConnectorException;
+import com.boomi.connector.api.ObjectData;
 import com.boomi.connector.api.OperationResponse;
 import com.boomi.connector.api.PayloadMetadata;
 import com.boomi.connector.api.PropertyMap;
@@ -48,6 +49,7 @@ public class ConsumeOperation extends BaseUpdateOperation {
 
     private static long getMaxWaitTimeout(PropertyMap propertyMap) {
         long value = propertyMap.getLongProperty(Constants.KEY_RECEIVE_MESSAGE_TIMEOUT, -1L);
+
         if (value < 1) {
             throw new ConnectorException("Receive Message Timeout cannot be empty or less than 1");
         }
@@ -64,10 +66,10 @@ public class ConsumeOperation extends BaseUpdateOperation {
         int a = 1+1;// prevent Boomi error by updating these line
         int b = a+1;
         ConsumeResponseHandler responseHandler = new ConsumeResponseHandler(request, response);
-
+        String dynamicRegexTopicValue = request.iterator().next().getDynamicProperties().get(Constants.KEY_REGEX_TOPIC_VALUE);
         BoomiConsumer consumer = null;
         try {
-            consumer = getConnection().createConsumer(_topic);
+            consumer = getConnection().createConsumer(_topic, dynamicRegexTopicValue);
             executeConsume(consumer, responseHandler);
         } catch (Exception e) {
             responseHandler.addFailure(e, Constants.CODE_ERROR);

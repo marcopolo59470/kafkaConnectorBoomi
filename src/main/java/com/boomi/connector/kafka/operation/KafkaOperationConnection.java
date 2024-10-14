@@ -42,9 +42,9 @@ public class KafkaOperationConnection extends KafkaConnection<OperationContext> 
      *         to subscribe
      * @return a new {@link BoomiConsumer}
      */
-    public BoomiConsumer createConsumer(String topic) {
+    public BoomiConsumer createConsumer(String dynamicRegexTopicValue, String topic) {
         if (isRegexTopic()){
-            return new BoomiConsumer(createSupplierRegex(regexTopicValue()));
+            return new BoomiConsumer(createSupplierRegex(regexTopicValue(dynamicRegexTopicValue)));
         }
 
         Supplier<BoomiCustomConsumer> supplier = isAssignPartitions() ? createSupplier(topic, getPartitionsIds())
@@ -116,7 +116,10 @@ public class KafkaOperationConnection extends KafkaConnection<OperationContext> 
         return getContext().getOperationProperties().getBooleanProperty(Constants.KEY_IS_REGEX_TOPIC, false);
     }
 
-    protected String regexTopicValue() {
+    protected String regexTopicValue(String dynamicRegexTopicValue) {
+        if (dynamicRegexTopicValue != null && !StringUtil.isEmpty(dynamicRegexTopicValue)){
+            return dynamicRegexTopicValue;
+        }
         return getContext().getOperationProperties().getProperty(Constants.KEY_REGEX_TOPIC_VALUE, "EMPTY_REGEX");
     }
 

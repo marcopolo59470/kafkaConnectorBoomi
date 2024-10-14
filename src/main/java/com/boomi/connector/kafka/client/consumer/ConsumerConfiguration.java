@@ -5,16 +5,23 @@ import com.boomi.connector.api.ConnectorException;
 import com.boomi.connector.api.OperationContext;
 import com.boomi.connector.api.PropertyMap;
 import com.boomi.connector.kafka.KafkaConnection;
+import com.boomi.connector.kafka.client.common.serialization.InputStreamSerializer;
 import com.boomi.connector.kafka.configuration.KafkaConfiguration;
 import com.boomi.connector.kafka.operation.CustomOperationType;
+import com.boomi.connector.kafka.operation.KafkaOperationConnection;
+import com.boomi.connector.kafka.util.AvroMode;
 import com.boomi.connector.kafka.util.Constants;
 import com.boomi.util.StringUtil;
 
+import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Wrapper for the properties needed to establish a connection with Apache Kafka and configure a Consumer
@@ -31,6 +38,14 @@ public class ConsumerConfiguration extends KafkaConfiguration<ConsumerConfig> {
         super(connection);
         putConfig(ConsumerConfig.GROUP_ID_CONFIG, getConnectionConsumerGroup(connection));
         putConfig(CommonClientConfigs.REQUEST_TIMEOUT_MS_CONFIG, timeout);
+
+    }
+
+    private AvroMode getAvroType(KafkaConnection<OperationContext> connection) {
+        String mode = connection.getContext().getOperationProperties().getProperty(Constants.KEY_AVRO_MODE);
+
+        //LOG.log(Level.INFO, AvroMode.getByCode(mode).toString());
+        return (mode == null || mode.isEmpty()) ? AvroMode.NO_MESSAGE : AvroMode.getByCode(mode);
     }
 
     /**
@@ -44,6 +59,19 @@ public class ConsumerConfiguration extends KafkaConfiguration<ConsumerConfig> {
         putConfig(ConsumerConfig.GROUP_ID_CONFIG, getConnectionConsumerGroup(connection));
         putNonNullConfigs(getOpConfig(connection));
         validateConsumerGroup(getConfigs());
+
+        String _avroType = getAvroType(connection).getCode();
+
+        if (Objects.equals(_avroType, "2")) {
+            putConfig(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getTypeName());
+            putConfig(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getTypeName());
+        } else if (Objects.equals(_avroType, "1")) {
+            putConfig(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getTypeName());
+            putConfig(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getTypeName());
+        } else {
+            putConfig(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getTypeName());
+            putConfig(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, InputStreamSerializer.class.getTypeName());
+        }
     }
 
     /**

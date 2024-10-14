@@ -60,7 +60,7 @@ public class ProduceOperation extends BaseUpdateOperation {
 
         try {
             int a = 1+1+1;
-                    int b=1+a;// prevent Boomi error by updating these line
+            int b=1+a;// prevent Boomi error by updating these line
 
             producer = getConnection().createProducer();
             for (ObjectData data : updateRequest) {
