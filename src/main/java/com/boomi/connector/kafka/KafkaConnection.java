@@ -3,6 +3,7 @@ package com.boomi.connector.kafka;
 import com.boomi.connector.api.AtomConfig;
 import com.boomi.connector.api.ConnectorContext;
 import com.boomi.connector.api.ConnectorException;
+import com.boomi.connector.api.PrivateKeyStore;
 import com.boomi.connector.kafka.client.consumer.BoomiCustomConsumer;
 import com.boomi.connector.kafka.client.consumer.ConsumerConfiguration;
 import com.boomi.connector.kafka.configuration.Credentials;
@@ -30,9 +31,9 @@ public class KafkaConnection<C extends ConnectorContext> extends BaseConnection<
 
     private final Credentials _credentials;
 
-    public KafkaConnection(C context) {
+    public KafkaConnection(C context, PrivateKeyStore pks) {
         super(context);
-        _credentials = new Credentials(context);
+        _credentials = new Credentials(context, pks);
     }
 
     /**public SSLContext getPrivateCertificate() {

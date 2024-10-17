@@ -13,6 +13,7 @@ import com.boomi.connector.kafka.util.AvroMode;
 import com.boomi.connector.kafka.util.Constants;
 import com.boomi.util.StringUtil;
 
+import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -63,14 +64,14 @@ public class ConsumerConfiguration extends KafkaConfiguration<ConsumerConfig> {
         String _avroType = getAvroType(connection).getCode();
 
         if (Objects.equals(_avroType, "2")) {
-            putConfig(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getTypeName());
-            putConfig(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getTypeName());
+            putConfig(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class.getTypeName());
+            putConfig(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class.getTypeName());
         } else if (Objects.equals(_avroType, "1")) {
-            putConfig(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getTypeName());
-            putConfig(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getTypeName());
+            putConfig(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringSerializer.class.getTypeName());
+            putConfig(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class.getTypeName());
         } else {
-            putConfig(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getTypeName());
-            putConfig(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, InputStreamSerializer.class.getTypeName());
+            putConfig(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringSerializer.class.getTypeName());
+            putConfig(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, InputStreamSerializer.class.getTypeName());
         }
     }
 

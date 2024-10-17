@@ -2,6 +2,7 @@ package com.boomi.connector.kafka.operation.polling;
 
 import com.boomi.connector.api.ConnectorException;
 import com.boomi.connector.api.OperationContext;
+import com.boomi.connector.api.PrivateKeyStore;
 import com.boomi.connector.kafka.client.consumer.BoomiCustomConsumer;
 import com.boomi.connector.kafka.operation.KafkaOperationConnection;
 import com.boomi.connector.kafka.util.Constants;
@@ -15,8 +16,8 @@ import java.util.function.Supplier;
  */
 public class KafkaPollingConnection extends KafkaOperationConnection {
 
-    public KafkaPollingConnection(OperationContext context) {
-        super(context);
+    public KafkaPollingConnection(OperationContext context, PrivateKeyStore pks) {
+        super(context, pks);
     }
 
     BoomiListenerConsumer createPollingConsumer(String dynamicRegexTopicValue, String topic) {

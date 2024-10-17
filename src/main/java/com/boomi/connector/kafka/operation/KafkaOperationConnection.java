@@ -2,6 +2,7 @@ package com.boomi.connector.kafka.operation;
 
 import com.boomi.connector.api.ConnectorException;
 import com.boomi.connector.api.OperationContext;
+import com.boomi.connector.api.PrivateKeyStore;
 import com.boomi.connector.kafka.KafkaConnection;
 import com.boomi.connector.kafka.client.consumer.BoomiCustomConsumer;
 import com.boomi.connector.kafka.client.consumer.ConsumerConfiguration;
@@ -21,8 +22,8 @@ import java.util.function.Supplier;
  */
 public class KafkaOperationConnection extends KafkaConnection<OperationContext> {
 
-    public KafkaOperationConnection(OperationContext context) {
-        super(context);
+    public KafkaOperationConnection(OperationContext context, PrivateKeyStore pks) {
+        super(context, pks);
     }
 
     public String getObjectTypeId() {

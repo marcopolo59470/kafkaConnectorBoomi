@@ -202,7 +202,6 @@
             </allowedValue>
             <visibilityCondition>
                 <valueCondition fieldId="avro.mode">
-                    <value>1</value>
                     <value>2</value>
                 </valueCondition>
             </visibilityCondition>
@@ -234,7 +233,6 @@
             </helpText>
             <visibilityCondition>
                 <valueCondition fieldId="avro.mode">
-                    <value>1</value>
                     <value>2</value>
                 </valueCondition>
             </visibilityCondition>
@@ -258,6 +256,7 @@
             </allowedValue>
             <visibilityCondition>
                 <valueCondition fieldId="avro.mode">
+                    <value>1</value>
                     <value>2</value>
                 </valueCondition>
             </visibilityCondition>
@@ -288,6 +287,7 @@
             </helpText>
             <visibilityCondition>
                 <valueCondition fieldId="avro.mode">
+                    <value>1</value>
                     <value>2</value>
                 </valueCondition>
             </visibilityCondition>
