@@ -2,7 +2,6 @@ package com.boomi.connector.kafka.operation;
 
 import com.boomi.connector.api.ConnectorException;
 import com.boomi.connector.api.OperationContext;
-import com.boomi.connector.api.PrivateKeyStore;
 import com.boomi.connector.kafka.KafkaConnection;
 import com.boomi.connector.kafka.client.consumer.BoomiCustomConsumer;
 import com.boomi.connector.kafka.client.consumer.ConsumerConfiguration;
@@ -11,10 +10,12 @@ import com.boomi.connector.kafka.operation.commit.BoomiCommitter;
 import com.boomi.connector.kafka.operation.consume.BoomiConsumer;
 import com.boomi.connector.kafka.operation.consume.BoomiCustomConsumerSupplierFactory;
 import com.boomi.connector.kafka.operation.produce.BoomiProducer;
+import com.boomi.connector.kafka.operation.produce.SSLCredentials;
 import com.boomi.connector.kafka.util.Constants;
 import com.boomi.connector.kafka.util.PartitionUtil;
 import com.boomi.util.StringUtil;
 
+import java.util.Map;
 import java.util.function.Supplier;
 
 /**
@@ -22,16 +23,16 @@ import java.util.function.Supplier;
  */
 public class KafkaOperationConnection extends KafkaConnection<OperationContext> {
 
-    public KafkaOperationConnection(OperationContext context, PrivateKeyStore pks) {
-        super(context, pks);
+    public KafkaOperationConnection(OperationContext context) {
+        super(context);
     }
 
     public String getObjectTypeId() {
         return getContext().getObjectTypeId();
     }
 
-    public BoomiProducer createProducer() {
-        return new BoomiProducer(ProducerConfiguration.create(this));
+    public BoomiProducer createProducer(SSLCredentials dynamicProperties) {
+        return new BoomiProducer(ProducerConfiguration.create(this, dynamicProperties));
     }
 
     /**
@@ -103,6 +104,7 @@ public class KafkaOperationConnection extends KafkaConnection<OperationContext> 
 
         return clientId;
     }
+
 
     /**
      * Get the configured assign partitions.

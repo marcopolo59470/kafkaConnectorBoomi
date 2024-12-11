@@ -11,7 +11,7 @@ public class BoomiCommitter implements Closeable {
     private final BoomiCustomConsumer _committer;
 
     public BoomiCommitter(ConsumerConfiguration boomiConfiguration) {
-        _committer = new BoomiCustomConsumer(boomiConfiguration);
+        _committer = new BoomiCustomConsumer(boomiConfiguration, null);
     }
 
     /**

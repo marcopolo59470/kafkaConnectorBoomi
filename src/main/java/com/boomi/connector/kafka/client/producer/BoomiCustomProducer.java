@@ -18,11 +18,9 @@ public class BoomiCustomProducer<K, V> extends KafkaProducer<K, V> {
     private int _maxRequestSize;
 
     public BoomiCustomProducer(ProducerConfiguration configuration) {
-        super(configuration.getConfig(), configuration.getClientId(), configuration.getChannelBuilder(),
-                configuration.getMaxRequestSize());
+        super(configuration.getConfig(), configuration.getClientId(), null, configuration.getMaxRequestSize());
         _maxWaitTimeout = configuration.getMaxWaitTimeout();
         _maxRequestSize = configuration.getMaxRequestSize();
-
     }
 
     /**

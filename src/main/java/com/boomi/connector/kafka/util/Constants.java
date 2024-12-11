@@ -14,8 +14,6 @@ public final class Constants {
     public static final String KEY_OAUTH_CLIENT_ID = "oauth_client_id";
     public static final String KEY_AVRO_MODE = "avro.mode";
     public static final String SCHEMA_REGISTRY_URL = "schema.registry.url";
-    public static final String BASIC_AUTH_USER_INFO = "basic.auth.user.info";
-    public static final String BASIC_AUTH_CREDENTIALS_SOURCE = "basic.auth.credentials.source";
     public static final String KEY_OAUTH_CLIENT_SECRET = "oauth_client_secret";
     public static final String KEY_OAUTH_SCOPE = "oauth_scope";
     public static final String KEY_CERTIFICATE = "private_certificate";
@@ -42,6 +40,12 @@ public final class Constants {
     public static final String AVRO_SCHEMA_MESSAGE = "avro.schema.message";
     public static final String KEY_SUBJECT_NAME_STRATEGY = "key.subject.name.strategy";
     public static final String VALUE_SUBJECT_NAME_STRATEGY = "value.subject.name.strategy";
+    public static final String BASIC_AUTH_USER_INFO = "basic.auth.user.info";
+    public static final String BASIC_AUTH_CREDENTIALS_SOURCE = "basic.auth.credentials.source";
+    public static final String ACCESS_KEY = "access.key";
+    public static final String ACCESS_CERT = "access.cert";
+    public static final String CA_CERTIFICATE = "ca.certificate";
+    public static final String BOOTSTRAP_SERVER = "bootstrap.server";
 
     // consumer & commit offset
     public static final String KEY_CONSUMER_GROUP = "consumer_group";
@@ -79,6 +83,12 @@ public final class Constants {
     public static final String KEY_MESSAGE_TIMESTAMP = "message_timestamp";
     public static final String HEADER_PROPERTIES_KEY = "header_properties";
     public static final String KEY_PARTITION_ID = "partition_id";
+    public static final String DYNAMIC_BASIC = "dynamic_basic";
+    public static final String DYNAMIC_AK = "dynamic_ak";
+    public static final String DYNAMIC_CERT = "dynamic_cert";
+    public static final String DYNAMIC_PEM = "dynamic_pem";
+    public static final String DYNAMIC_BOOTSTRAP = "dynamic_bootstrap";
+    public static final String DYNAMIC_REGISTRY = "dynamic_registry";
     
     public static final String DYNAMIC_TOPIC_ID = "DYNAMIC_TOPIC";
     public static final String DYNAMIC_TOPIC_LABEL = "Dynamic Topic";

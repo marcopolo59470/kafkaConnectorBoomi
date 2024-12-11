@@ -3,11 +3,9 @@ package com.boomi.connector.kafka;
 import com.boomi.connector.api.AtomConfig;
 import com.boomi.connector.api.ConnectorContext;
 import com.boomi.connector.api.ConnectorException;
-import com.boomi.connector.api.PrivateKeyStore;
 import com.boomi.connector.kafka.client.consumer.BoomiCustomConsumer;
 import com.boomi.connector.kafka.client.consumer.ConsumerConfiguration;
 import com.boomi.connector.kafka.configuration.Credentials;
-import com.boomi.connector.kafka.util.AvroMode;
 import com.boomi.connector.kafka.util.Constants;
 import com.boomi.connector.util.BaseConnection;
 import com.boomi.util.IOUtil;
@@ -31,16 +29,11 @@ public class KafkaConnection<C extends ConnectorContext> extends BaseConnection<
 
     private final Credentials _credentials;
 
-    public KafkaConnection(C context, PrivateKeyStore pks) {
+    public KafkaConnection(C context) {
         super(context);
-        _credentials = new Credentials(context, pks);
+        _credentials = new Credentials(context);
     }
 
-    /**public SSLContext getPrivateCertificate() {
-        SSLContextFactory sslContextFactory = new SSLContextFactory();
-        PrivateKeyStore certificate = getContext().getConnectionProperties().getPrivateKeyStoreProperty(Constants.KEY_CERTIFICATE_OPERATION);
-        return sslContextFactory.create(certificate);
-    }*/
     /**
      * Perform a request to Kafka in order to retrieve a {@link Set} of the available topics
      *
@@ -50,7 +43,7 @@ public class KafkaConnection<C extends ConnectorContext> extends BaseConnection<
         Consumer<Object, InputStream> consumer = null;
 
         try {
-            consumer = new BoomiCustomConsumer(ConsumerConfiguration.browse(this));
+            consumer = new BoomiCustomConsumer(ConsumerConfiguration.browse(this), ConsumerConfiguration.browse(this).getChannelBuilder());
             return consumer.listTopics().keySet();
         } catch (InvalidReceiveException e) {
             String message = e.getMessage();
@@ -65,39 +58,12 @@ public class KafkaConnection<C extends ConnectorContext> extends BaseConnection<
         return DEFAULT_CLIENT_ID;
     }
 
-
-    public String getKeyStrategy() {
-        return getContext().getConnectionProperties().getProperty(Constants.KEY_SUBJECT_NAME_STRATEGY);
-    }
-
-    public String getMessageStrategy() {
-        return getContext().getConnectionProperties().getProperty(Constants.VALUE_SUBJECT_NAME_STRATEGY);
-    }
-
-    /**public AvroMode getAvroType() {
-        String mode = getContext().getConnectionProperties().getProperty(Constants.KEY_AVRO_MODE);
-
-        //LOG.log(Level.INFO, AvroMode.getByCode(mode).toString());
-        return (mode == null || mode.isEmpty()) ? AvroMode.NO_MESSAGE : AvroMode.getByCode(mode);
-    }*/
     public Credentials getCredentials() {
         return _credentials;
     }
 
     public String getBootstrapServers() {
         return getContext().getConnectionProperties().getProperty(Constants.KEY_SERVERS);
-    }
-
-    public String getSchemaRegistry() {
-        return getContext().getConnectionProperties().getProperty(Constants.SCHEMA_REGISTRY_URL);
-    }
-
-    public String getBasicAuth() {
-        return getContext().getConnectionProperties().getProperty(Constants.BASIC_AUTH_USER_INFO);
-    }
-
-    public String getBasicSource() {
-        return getContext().getConnectionProperties().getProperty(Constants.BASIC_AUTH_CREDENTIALS_SOURCE);
     }
 
     public int getMaxRequestSize() {
@@ -125,9 +91,5 @@ public class KafkaConnection<C extends ConnectorContext> extends BaseConnection<
         }
 
         return value;
-    }
-
-    static String defaultValueIfNullOrBlank(String value, String defaultValue) {
-        return (value == null || value.isBlank()) ? defaultValue : value;
     }
 }

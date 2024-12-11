@@ -8,19 +8,19 @@ import com.boomi.connector.api.ResponseUtil;
 import com.boomi.connector.api.UpdateRequest;
 import com.boomi.connector.kafka.exception.InvalidMessageSizeException;
 import com.boomi.connector.kafka.operation.KafkaOperationConnection;
-import com.boomi.connector.kafka.util.AvroMode;
 import com.boomi.connector.kafka.util.Constants;
 import com.boomi.connector.kafka.util.ErrorCodeHelper;
 import com.boomi.connector.kafka.util.ResultUtil;
 import com.boomi.connector.kafka.util.TopicNameUtil;
 import com.boomi.connector.util.BaseUpdateOperation;
 import com.boomi.util.IOUtil;
-import com.boomi.util.LogUtil;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
-import java.util.logging.Logger;
 
 /**
  * Execute Operation for publishing messages to Apache Kafka.
@@ -37,8 +37,6 @@ public class ProduceOperation extends BaseUpdateOperation {
         _topic = TopicNameUtil.getTopic(connection.getObjectTypeId(), connection.getContext());
         _isDynamicTopic = Constants.DYNAMIC_TOPIC_ID.equals(connection.getObjectTypeId());
     }
-
-    private static final Logger LOG = LogUtil.getLogger(ProduceOperation.class);
 
     @Override
     public KafkaOperationConnection getConnection() {
@@ -57,25 +55,41 @@ public class ProduceOperation extends BaseUpdateOperation {
     protected void executeUpdate(UpdateRequest updateRequest, OperationResponse response) {
         BoomiProducer producer = null;
         PropertyMap property = getConnection().getContext().getOperationProperties();
+        List<ObjectData> requestCopy = new ArrayList<>();
+        for (ObjectData data : updateRequest) {
+            requestCopy.add(data);
+        }
+
+        ObjectData firstElement = requestCopy.get(0);
+        Map<String, String> dynamicProperties = firstElement.getDynamicProperties();
+
+        String connectionBootstrap = getConnection().getContext().getConnectionProperties().getProperty(Constants.KEY_SERVERS);
+
+        SSLCredentials sslCredentials = new SSLCredentials(
+                dynamicProperties.get(Constants.DYNAMIC_BASIC),
+                dynamicProperties.get(Constants.DYNAMIC_AK),
+                dynamicProperties.get(Constants.DYNAMIC_CERT),
+                dynamicProperties.get(Constants.DYNAMIC_PEM),
+                (connectionBootstrap != null && !connectionBootstrap.isEmpty()) ? connectionBootstrap : dynamicProperties.get(Constants.DYNAMIC_BOOTSTRAP),
+                dynamicProperties.get(Constants.DYNAMIC_REGISTRY)
+        );
 
         try {
-            int a = 1+1+1;
-            int b=1+a;// prevent Boomi error by updating these line
-
-            producer = getConnection().createProducer();
-            for (ObjectData data : updateRequest) {
+            producer = getConnection().createProducer(sslCredentials);
+            for (ObjectData data : requestCopy) {
                 process(producer, data, response, property.getProperty(Constants.AVRO_SCHEMA_KEY), property.getProperty(Constants.AVRO_SCHEMA_MESSAGE));
             }
-            //process(producer, data, response, getConnection().getSchemaKey(), getConnection().getSchemaMessage());
 
         } catch (InterruptedException e) {
             // mark pending documents as Failure
             ResponseUtil.addExceptionFailures(response, updateRequest, e);
             // signal this thread as interrupted
             Thread.currentThread().interrupt();
+            throw new ConnectorException(e);
         } catch (Exception e) {
             // mark pending documents as Failure
             ResponseUtil.addExceptionFailures(response, updateRequest, e);
+            throw new ConnectorException(e);
         } finally {
             IOUtil.closeQuietly(producer);
         }
@@ -92,8 +106,10 @@ public class ProduceOperation extends BaseUpdateOperation {
      * @throws ConnectorException If a Timeout error arises.
      */
     private void process(BoomiProducer producer, ObjectData data, OperationResponse response, String schemaKey, String schemaMessage)
-            throws InterruptedException {
+           throws InterruptedException {
+
         ProduceMessage message = null;
+
         try {
             message = new ProduceMessage(data, _topic, producer.getMaxRequestSize());
             //TODO: beautify this
@@ -125,7 +141,7 @@ public class ProduceOperation extends BaseUpdateOperation {
             // add the result for the current document
             ResponseUtil.addExceptionFailure(response, data, e);
             // and re throw the Exception
-            throw e;
+            //throw e;
         } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {

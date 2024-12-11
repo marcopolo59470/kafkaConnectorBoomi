@@ -16,17 +16,19 @@ import java.util.function.Supplier;
  */
 public class KafkaPollingConnection extends KafkaOperationConnection {
 
-    public KafkaPollingConnection(OperationContext context, PrivateKeyStore pks) {
-        super(context, pks);
+    public KafkaPollingConnection(OperationContext context) {
+        super(context);
     }
 
     BoomiListenerConsumer createPollingConsumer(String dynamicRegexTopicValue, String topic) {
+
         if (isRegexTopic()){
             return new BoomiListenerConsumer(createSupplierRegex(regexTopicValue(dynamicRegexTopicValue)));
         }
 
         Supplier<BoomiCustomConsumer> supplier = isAssignPartitions() ? createSupplier(topic, getPartitionsIds())
                 : createSupplier(topic);
+
         return new BoomiListenerConsumer(supplier);
     }
 
@@ -70,14 +72,12 @@ public class KafkaPollingConnection extends KafkaOperationConnection {
         return pollInterval;
     }
 
-    /**public SSLContext getPrivateCertificate() {
-        SSLContextFactory sslContextFactory = new SSLContextFactory();
-        PrivateKeyStore certificate = getContext().getConnectionProperties().getPrivateKeyStoreProperty(Constants.KEY_CERTIFICATE_OPERATION);
-        return sslContextFactory.create(certificate);
-    }*/
-
     String getConsumerGroup() {
         return getContext().getOperationProperties().getProperty(Constants.KEY_CONSUMER_GROUP);
+    }
+
+    String getPattern() {
+        return getContext().getOperationProperties().getProperty(Constants.KEY_REGEX_TOPIC_VALUE);
     }
 
     /**

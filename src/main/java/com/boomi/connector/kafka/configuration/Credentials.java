@@ -27,8 +27,9 @@ public class Credentials {
     private final String _oauthClientSecret;
     private final String _oauthScope;
 
-    public Credentials(ConnectorContext context, PrivateKeyStore pks) {
+    public Credentials(ConnectorContext context) {
         PropertyMap connectionProperties = context.getConnectionProperties();
+        int a = 1;
         // connection properties
 
         _securityProtocol = NumberUtil.toEnum(SecurityProtocol.class,
@@ -49,10 +50,9 @@ public class Credentials {
         _serviceName = connectionProperties.getProperty(Constants.KEY_SERVICE_PRINCIPAL);
 
         // SSL context
+        _sslContext = createSSLContext(connectionProperties.getPrivateKeyStoreProperty(Constants.KEY_CERTIFICATE));
+        //_sslContext = (pks != null) ? createSSLContext(pks) : createSSLContext(connectionProperties.getPrivateKeyStoreProperty(Constants.KEY_CERTIFICATE));
 
-        _sslContext = (pks != null) ? createSSLContext(pks) : createSSLContext(connectionProperties.getPrivateKeyStoreProperty(Constants.KEY_CERTIFICATE));
-        //_sslContext = createSSLContext(connectionProperties);
-        //_sslContext = null;
     }
 
     private SSLContext createSSLContext(PrivateKeyStore pks) {

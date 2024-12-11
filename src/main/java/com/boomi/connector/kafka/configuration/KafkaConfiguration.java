@@ -1,16 +1,12 @@
 package com.boomi.connector.kafka.configuration;
 
 import com.boomi.connector.api.ConnectorContext;
-import com.boomi.connector.api.PropertyMap;
 import com.boomi.connector.kafka.KafkaConnection;
 import com.boomi.connector.kafka.client.common.kerberos.KerberosTicketCache;
 import com.boomi.connector.kafka.client.common.kerberos.KerberosTicketKey;
 import com.boomi.connector.kafka.client.common.network.BoomiChannelFactory;
 import com.boomi.connector.kafka.client.common.serialization.InputStreamDeserializer;
 import com.boomi.connector.kafka.client.common.serialization.InputStreamSerializer;
-import com.boomi.connector.kafka.operation.KafkaOperationConnection;
-import com.boomi.connector.kafka.util.AvroMode;
-import com.boomi.connector.kafka.util.Constants;
 import com.boomi.connector.util.ConnectorCache;
 import com.boomi.connector.util.ConnectorCacheFactory;
 import com.boomi.util.ByteUnit;
@@ -53,24 +49,13 @@ public abstract class KafkaConfiguration<T extends AbstractConfig> implements Co
     //private final String _avroType;
 
     protected KafkaConfiguration(KafkaConnection<? extends ConnectorContext> connection) {
-
         _context = connection.getContext();
         _credentials = Objects.requireNonNull(connection.getCredentials());
-        _configs = buildBaseConfiguration(connection.getBootstrapServers(), connection.getSchemaRegistry(), connection.getBasicAuth(), connection.getBasicSource());
+        _configs = buildBaseConfiguration(connection.getBootstrapServers());
         _maxRequestSize = connection.getMaxRequestSize();
         _clientId = connection.getClientId();
-        //TODO: change this
-        //_avroType = connection.getAvroType().getCode();
-        setMaxRequestSize(_maxRequestSize, _configs);
 
-        /**if (Objects.equals(_avroType, "2")) {
-            setSerializationWithMessageAndKey(_configs);
-        } else if (Objects.equals(_avroType, "1")) {
-            setSerializationWithMessage(_configs);
-        } else {
-            setSerialization(_configs);
-        }*/
-//setSerializationWithMessage(_configs);
+        setMaxRequestSize(_maxRequestSize, _configs);
 
     }
 
@@ -83,28 +68,26 @@ public abstract class KafkaConfiguration<T extends AbstractConfig> implements Co
         configs.put(ConsumerConfig.HEARTBEAT_INTERVAL_MS_CONFIG, DEFAULT_INTERVAL_HEARTBEAT);
         configs.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, maxRequestSize);
         configs.put(ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG, maxRequestSize);
-        //configs.put(AbstractKafkaSchemaSerDeConfig.KEY_SUBJECT_NAME_STRATEGY, _keyStrategy);
-        //configs.put(AbstractKafkaSchemaSerDeConfig.VALUE_SUBJECT_NAME_STRATEGY, _messageStrategy);
-        configs.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getTypeName());
-        configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getTypeName());
-        configs.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class.getTypeName());
-        configs.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class.getTypeName());
+        //configs.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getTypeName());
+        //configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getTypeName());
+        //configs.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class.getTypeName());
+        //configs.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class.getTypeName());
+        configs.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getTypeName());
+        configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, InputStreamSerializer.class.getTypeName());
+        configs.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getTypeName());
+        configs.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, InputStreamDeserializer.class.getTypeName());
     }
 
 
 
 
-    private static Map<String, Object> buildBaseConfiguration(String bootstrapServers, String url, String basic, String source) {
+    private static Map<String, Object> buildBaseConfiguration(String bootstrapServers) {
         Map<String, Object> configs = new HashMap<>();
         configs.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         // setting max inflight request to 1 as we are not supporting multithreading
         configs.put(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, 1);
         // disable retries
         configs.put(CommonClientConfigs.RETRIES_CONFIG, 0);
-        configs.put("schema.registry.url", url);
-        configs.put("basic.auth.user.info", basic);
-        configs.put("basic.auth.credentials.source", source);
-
 
         return configs;
     }

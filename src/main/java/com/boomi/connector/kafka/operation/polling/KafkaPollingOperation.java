@@ -53,7 +53,7 @@ public class KafkaPollingOperation extends UnmanagedListenOperation
     }
 
     private KafkaPollingOperation(KafkaPollingConnection connection, String operationId) {
-        this(connection, connection.createPollingConsumer(null,
+        this(connection, connection.createPollingConsumer(connection.getPattern(),
                         TopicNameUtil.getTopic(connection.getObjectTypeId(), connection.getContext())),
                 ExecutorUtil.newScheduler(operationId));
     }
@@ -69,6 +69,7 @@ public class KafkaPollingOperation extends UnmanagedListenOperation
         _delay = connection.getPollingDelay();
         _interval = connection.getPollingInterval();
         _isSingletonListener = connection.isSingletonListener();
+
     }
 
     private static String getExecutorServiceName(KafkaPollingConnection connection) {

@@ -7,6 +7,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.KafkaException;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.network.ChannelBuilder;
 
 import java.io.InputStream;
 import java.time.Duration;
@@ -21,10 +22,11 @@ public class BoomiCustomConsumer extends KafkaConsumer<Object, InputStream> {
 
     private boolean _assignPartitions;
 
-    public BoomiCustomConsumer(ConsumerConfiguration configuration) {
-        super(configuration.getConfig(), configuration.getClientId(), configuration.getChannelBuilder(),
+    public BoomiCustomConsumer(ConsumerConfiguration configuration, ChannelBuilder channelBuilder) {
+        super(configuration.getConfig(), configuration.getClientId(), channelBuilder,
                 configuration.getMaxRequestSize());
     }
+
 
     /**public BoomiCustomConsumer(Properties configuration, Deserializer<String> keyDeserializer, Deserializer<GenericRecord> valueDeserializer) {
         super(configuration, keyDeserializer, valueDeserializer);

@@ -1,10 +1,12 @@
 package com.boomi.connector.kafka.client.consumer;
 
+
 import com.boomi.connector.api.ConnectorContext;
 import com.boomi.connector.api.ConnectorException;
 import com.boomi.connector.api.OperationContext;
 import com.boomi.connector.api.PropertyMap;
 import com.boomi.connector.kafka.KafkaConnection;
+import com.boomi.connector.kafka.client.common.serialization.InputStreamDeserializer;
 import com.boomi.connector.kafka.client.common.serialization.InputStreamSerializer;
 import com.boomi.connector.kafka.configuration.KafkaConfiguration;
 import com.boomi.connector.kafka.operation.CustomOperationType;
@@ -13,16 +15,22 @@ import com.boomi.connector.kafka.util.AvroMode;
 import com.boomi.connector.kafka.util.Constants;
 import com.boomi.util.StringUtil;
 
+import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
+import io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.config.SslConfigs;
+import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+
+import static com.boomi.connector.kafka.util.Tools.translateEscapes;
 
 /**
  * Wrapper for the properties needed to establish a connection with Apache Kafka and configure a Consumer
@@ -38,12 +46,14 @@ public class ConsumerConfiguration extends KafkaConfiguration<ConsumerConfig> {
     private ConsumerConfiguration(KafkaConnection<? extends ConnectorContext> connection, int timeout) {
         super(connection);
         putConfig(ConsumerConfig.GROUP_ID_CONFIG, getConnectionConsumerGroup(connection));
+
         putConfig(CommonClientConfigs.REQUEST_TIMEOUT_MS_CONFIG, timeout);
 
     }
 
     private AvroMode getAvroType(KafkaConnection<OperationContext> connection) {
         String mode = connection.getContext().getOperationProperties().getProperty(Constants.KEY_AVRO_MODE);
+
 
         //LOG.log(Level.INFO, AvroMode.getByCode(mode).toString());
         return (mode == null || mode.isEmpty()) ? AvroMode.NO_MESSAGE : AvroMode.getByCode(mode);
@@ -61,17 +71,40 @@ public class ConsumerConfiguration extends KafkaConfiguration<ConsumerConfig> {
         putNonNullConfigs(getOpConfig(connection));
         validateConsumerGroup(getConfigs());
 
+
+        //Authentification
+        putConfig(SchemaRegistryClientConfig.USER_INFO_CONFIG, connection.getContext().getOperationProperties().getProperty(Constants.BASIC_AUTH_USER_INFO));
+        putConfig(SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE, translateEscapes(connection.getContext().getOperationProperties().getProperty(Constants.BASIC_AUTH_CREDENTIALS_SOURCE)));
+
+        //bootstrap
+        putConfig(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, translateEscapes(connection.getContext().getOperationProperties().getProperty(Constants.BOOTSTRAP_SERVER)));
+        putConfig(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL");
+        putConfig(SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG,"PEM");
+        putConfig(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG,"PEM");
+        //key
+        putConfig(SslConfigs.SSL_KEYSTORE_KEY_CONFIG, translateEscapes(connection.getContext().getOperationProperties().getProperty(Constants.ACCESS_KEY)));
+        //cert
+        putConfig(SslConfigs.SSL_KEYSTORE_CERTIFICATE_CHAIN_CONFIG, translateEscapes(connection.getContext().getOperationProperties().getProperty(Constants.ACCESS_CERT)));
+        //pem
+        putConfig(SslConfigs.SSL_TRUSTSTORE_CERTIFICATES_CONFIG, translateEscapes(connection.getContext().getOperationProperties().getProperty(Constants.CA_CERTIFICATE)));
+
+        if (connection.getContext().getOperationProperties().getBooleanProperty(Constants.KEY_IS_REGEX_TOPIC, false)) {
+            putConfig(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG, "org.apache.kafka.clients.consumer.CooperativeStickyAssignor");
+        }
+
         String _avroType = getAvroType(connection).getCode();
 
         if (Objects.equals(_avroType, "2")) {
+            putConfig("schema.registry.url", connection.getContext().getOperationProperties().getProperty(Constants.SCHEMA_REGISTRY_URL));
             putConfig(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class.getTypeName());
             putConfig(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class.getTypeName());
         } else if (Objects.equals(_avroType, "1")) {
-            putConfig(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringSerializer.class.getTypeName());
+            putConfig("schema.registry.url", connection.getContext().getOperationProperties().getProperty(Constants.SCHEMA_REGISTRY_URL));
+            putConfig(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getTypeName());
             putConfig(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class.getTypeName());
         } else {
-            putConfig(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringSerializer.class.getTypeName());
-            putConfig(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, InputStreamSerializer.class.getTypeName());
+            putConfig(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getTypeName());
+            putConfig(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, InputStreamDeserializer.class.getTypeName());
         }
     }
 

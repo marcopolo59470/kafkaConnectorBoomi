@@ -4,8 +4,6 @@ import com.boomi.connector.api.BrowseContext;
 import com.boomi.connector.api.Browser;
 import com.boomi.connector.api.Operation;
 import com.boomi.connector.api.OperationContext;
-import com.boomi.connector.api.PrivateKeyStore;
-import com.boomi.connector.api.PropertyMap;
 import com.boomi.connector.kafka.operation.CustomOperationType;
 import com.boomi.connector.kafka.operation.KafkaOperationConnection;
 import com.boomi.connector.kafka.operation.commit.CommitOffsetOperation;
@@ -13,8 +11,6 @@ import com.boomi.connector.kafka.operation.consume.ConsumeOperation;
 import com.boomi.connector.kafka.operation.polling.KafkaPollingConnection;
 import com.boomi.connector.kafka.operation.polling.KafkaPollingOperation;
 import com.boomi.connector.kafka.operation.produce.ProduceOperation;
-import com.boomi.connector.kafka.util.AvroMode;
-import com.boomi.connector.kafka.util.Constants;
 import com.boomi.connector.util.listen.UnmanagedListenConnector;
 import com.boomi.connector.util.listen.UnmanagedListenOperation;
 
@@ -29,8 +25,7 @@ public class KafkaConnector extends UnmanagedListenConnector {
      */
     @Override
     public Browser createBrowser(BrowseContext context) {
-        PrivateKeyStore pks = context.getOperationProperties().getPrivateKeyStoreProperty(Constants.KEY_CERTIFICATE_OPERATION);
-        return new KafkaBrowser(new KafkaConnection<>(context, pks));
+        return new KafkaBrowser(new KafkaConnection<>(context));
     }
 
     /**
@@ -43,8 +38,8 @@ public class KafkaConnector extends UnmanagedListenConnector {
     @Override
     public Operation createExecuteOperation(OperationContext context) {
         CustomOperationType operationType = CustomOperationType.fromContext(context);
-        PrivateKeyStore pks = context.getOperationProperties().getPrivateKeyStoreProperty(Constants.KEY_CERTIFICATE_OPERATION);
-        KafkaOperationConnection connection = new KafkaOperationConnection(context, pks);
+
+        KafkaOperationConnection connection = new KafkaOperationConnection(context);
 
         switch (operationType) {
             case PRODUCE:
@@ -61,7 +56,6 @@ public class KafkaConnector extends UnmanagedListenConnector {
 
     @Override
     public UnmanagedListenOperation createListenOperation(OperationContext context) {
-        PrivateKeyStore pks = context.getOperationProperties().getPrivateKeyStoreProperty(Constants.KEY_CERTIFICATE_OPERATION);
-        return new KafkaPollingOperation(new KafkaPollingConnection(context, pks));
+        return new KafkaPollingOperation(new KafkaPollingConnection(context));
     }
 }
