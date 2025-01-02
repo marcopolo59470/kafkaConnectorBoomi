@@ -2,7 +2,6 @@ package com.boomi.connector.kafka.operation.produce;
 
 import com.boomi.connector.kafka.client.producer.BoomiCustomProducer;
 import com.boomi.connector.kafka.client.producer.ProducerConfiguration;
-import com.boomi.util.IOUtil;
 
 import org.apache.kafka.clients.producer.ProducerRecord;
 
@@ -18,6 +17,11 @@ public class BoomiProducer<K, V> implements Closeable {
 
     private final BoomiCustomProducer<K, V> producer;
 
+    /**
+     * Constructor initializing the custom producer.
+     *
+     * @param boomiConfiguration Producer configuration object.
+     */
     public BoomiProducer(ProducerConfiguration boomiConfiguration) {
         this.producer = new BoomiCustomProducer<>(boomiConfiguration);
     }
@@ -26,9 +30,10 @@ public class BoomiProducer<K, V> implements Closeable {
      * Sends the given message to the Service.
      *
      * @param record The message to be sent.
-     * @throws ExecutionException If the service returns any error after sending the message.
+     * @throws ExecutionException   If the service returns any error after sending the message.
      * @throws InterruptedException If the thread is interrupted while blocked.
-     * @throws TimeoutException If the time taken for sending the message has surpassed the maximum wait timeout configured in the producer.
+     * @throws TimeoutException     If the time taken for sending the message has surpassed the maximum wait timeout
+     *                              configured in the producer.
      */
     public void sendMessage(ProducerRecord<K, V> record)
             throws InterruptedException, ExecutionException, TimeoutException {
@@ -36,14 +41,19 @@ public class BoomiProducer<K, V> implements Closeable {
     }
 
     /**
-     * @return the maximum message size allow for the publish operation. This value is set as a container property.
+     * @return the maximum message size allowed for the publish operation. This value is set as a container property.
      */
     public int getMaxRequestSize() {
         return producer.getMaxRequestSize();
     }
 
+    /**
+     * Closes the producer and releases resources.
+     */
     @Override
     public void close() {
-        IOUtil.closeQuietly(producer);
+        if (producer != null) {
+            producer.close();
+        }
     }
 }

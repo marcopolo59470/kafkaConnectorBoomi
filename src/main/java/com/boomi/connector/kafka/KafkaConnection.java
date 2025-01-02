@@ -21,7 +21,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class KafkaConnection<C extends ConnectorContext> extends BaseConnection<C> {
+public class KafkaConnection<C extends ConnectorContext> extends BaseConnection<C>  {
 
     private static final Logger LOG = LogUtil.getLogger(KafkaConnector.class);
     private static final String DEFAULT_CLIENT_ID = "Boomi Connector";
@@ -40,17 +40,12 @@ public class KafkaConnection<C extends ConnectorContext> extends BaseConnection<
      * @return a Set of the available topics
      */
     Set<String> getTopics() {
-        Consumer<Object, InputStream> consumer = null;
-
-        try {
-            consumer = new BoomiCustomConsumer(ConsumerConfiguration.browse(this), ConsumerConfiguration.browse(this).getChannelBuilder());
-            return consumer.listTopics().keySet();
+        try (BoomiCustomConsumer customConsumer = new BoomiCustomConsumer(ConsumerConfiguration.browse(this))) {
+            return customConsumer.getKafkaConsumer().listTopics().keySet();
         } catch (InvalidReceiveException e) {
             String message = e.getMessage();
             LOG.log(Level.SEVERE, message, e);
             throw new ConnectorException(MessageFormat.format(INVALID_SIZE_MESSAGE, message));
-        } finally {
-            IOUtil.closeQuietly(consumer);
         }
     }
 

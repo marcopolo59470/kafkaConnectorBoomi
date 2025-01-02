@@ -40,7 +40,13 @@ public class BoomiListenerConsumer implements Closeable {
      * Subscribes to the topic provided when this object was constructed
      */
     void subscribe() {
-        IOUtil.closeQuietly(_consumer);
+        try {
+            if (_consumer != null) {
+                _consumer.close();
+            }
+        } catch (Exception e) {
+            LOG.log(Level.WARNING, "Error while closing consumer", e);
+        }
 
         boolean isSuccess = false;
         try {
@@ -56,7 +62,13 @@ public class BoomiListenerConsumer implements Closeable {
             isSuccess = true;
         } finally {
             if (!isSuccess) {
-                IOUtil.closeQuietly(_consumer);
+                try {
+                    if (_consumer != null) {
+                        _consumer.close();
+                    }
+                } catch (Exception e) {
+                    LOG.log(Level.WARNING, "Error while closing consumer", e);
+                }
             }
         }
     }
@@ -116,6 +128,7 @@ public class BoomiListenerConsumer implements Closeable {
     void commit(Map<TopicPartition, OffsetAndMetadata> lastOffsets) {
         Map<TopicPartition, OffsetAndMetadata> positions = new HashMap<>();
         String topic = null;
+
         for (TopicPartition partition : _consumer.assignment()) {
             topic = partition.topic();
             OffsetAndMetadata metadata = lastOffsets.get(partition);
@@ -128,9 +141,16 @@ public class BoomiListenerConsumer implements Closeable {
         _consumer.commitAsync(positions, COMMIT_CALLBACK);
     }
 
+
     @Override
     public void close() {
-        IOUtil.closeQuietly(_consumer);
+        try {
+            if (_consumer != null) {
+                _consumer.close();
+            }
+        } catch (Exception e) {
+            LOG.log(Level.WARNING, "Error while closing consumer", e);
+        }
     }
 
     /**

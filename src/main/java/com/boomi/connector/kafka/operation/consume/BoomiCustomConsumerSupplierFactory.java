@@ -42,18 +42,13 @@ public final class BoomiCustomConsumerSupplierFactory {
             Collection<TopicPartition> topicPartitions) {
         return () -> {
             logContext = new LogContext(String.format("[Producer Boomi Listener] "));
-            ChannelBuilder channelBuilder = createChannelBuilder(config.getConfig(), Time.SYSTEM, logContext);
-            BoomiCustomConsumer consumer = new BoomiCustomConsumer(config, channelBuilder);
+            //ChannelBuilder channelBuilder = createChannelBuilder(config.getConfig(), Time.SYSTEM, logContext);
+            BoomiCustomConsumer consumer = new BoomiCustomConsumer(config);
             consumer.assign(topicPartitions);
             return consumer;
         };
     }
 
-    public static ChannelBuilder createChannelBuilder(AbstractConfig config, Time time, LogContext logContext) {
-        SecurityProtocol securityProtocol = SecurityProtocol.forName(config.getString("security.protocol"));
-        String clientSaslMechanism = config.getString("sasl.mechanism");
-        return ChannelBuilders.clientChannelBuilder(securityProtocol, JaasContext.Type.CLIENT, config, (ListenerName)null, clientSaslMechanism, time, true, logContext);
-    }
 
     /**
      * Create a {@link BoomiCustomConsumer} and subscribe the given topic.
@@ -66,7 +61,7 @@ public final class BoomiCustomConsumerSupplierFactory {
      */
     public static Supplier<BoomiCustomConsumer> createSupplier(ConsumerConfiguration config, String topic) {
         return () -> {
-            BoomiCustomConsumer consumer = new BoomiCustomConsumer(config, null);
+            BoomiCustomConsumer consumer = new BoomiCustomConsumer(config);
             consumer.subscribe(topic);
             return consumer;
         };
@@ -74,7 +69,7 @@ public final class BoomiCustomConsumerSupplierFactory {
 
     public static Supplier<BoomiCustomConsumer> createSupplierRegex(ConsumerConfiguration config, String regex) {
         return () -> {
-            BoomiCustomConsumer consumer = new BoomiCustomConsumer(config, null);
+            BoomiCustomConsumer consumer = new BoomiCustomConsumer(config);
             consumer.subscribeWithPattern(Pattern.compile(regex));
             return consumer;
         };

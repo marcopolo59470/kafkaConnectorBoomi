@@ -1,5 +1,6 @@
 package com.boomi.connector.kafka.client.common.network;
 
+import com.boomi.connector.api.ConnectorException;
 import com.boomi.connector.kafka.configuration.Configuration;
 import com.boomi.connector.kafka.configuration.SASLMechanism;
 
@@ -30,8 +31,8 @@ public class BoomiChannelFactory {
                 break;
             case SASL_SSL:
             case SASL_PLAINTEXT:
-                channelBuilder = new BoomiSaslChannelBuilder(sslFactory, mechanism, configuration);
-                break;
+                //channelBuilder = new BoomiSaslChannelBuilder(sslFactory, mechanism, configuration);
+                throw new ConnectorException("Not Implemented yet");
             case PLAINTEXT:
                 ListenerName listener = ListenerName.forSecurityProtocol(SecurityProtocol.PLAINTEXT);
                 channelBuilder = new PlaintextChannelBuilder(listener);
@@ -48,3 +49,4 @@ public class BoomiChannelFactory {
         return (SecurityProtocol.SASL_SSL == securityProtocol) || (SecurityProtocol.SSL == securityProtocol);
     }
 }
+

@@ -1,4 +1,4 @@
-package com.boomi.connector.kafka.client.common.network;
+/**package com.boomi.connector.kafka.client.common.network;
 
 import com.boomi.connector.kafka.client.common.kerberos.BoomiGssClientFactory;
 import com.boomi.connector.kafka.client.common.security.BoomiSaslCallbackHandler;
@@ -139,4 +139,4 @@ public class BoomiSaslChannelBuilder implements ChannelBuilder {
     public void close() {
         //Nothing to do
     }
-}
+} */

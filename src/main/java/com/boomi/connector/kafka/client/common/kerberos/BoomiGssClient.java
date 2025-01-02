@@ -1,7 +1,7 @@
 package com.boomi.connector.kafka.client.common.kerberos;
 
 import com.boomi.connector.api.ConnectorException;
-import com.boomi.connector.kafka.client.common.network.BoomiSaslChannelBuilder;
+//import com.boomi.connector.kafka.client.common.network.BoomiSaslChannelBuilder;
 import com.boomi.util.LogUtil;
 import com.sun.security.sasl.util.AbstractSaslImpl;
 

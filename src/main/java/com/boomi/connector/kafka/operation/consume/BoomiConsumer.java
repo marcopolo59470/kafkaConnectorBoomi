@@ -63,12 +63,23 @@ public class BoomiConsumer implements Closeable {
     }
 
     void reSubscribe() {
-        IOUtil.closeQuietly(_consumer);
+        closeQuietly(_consumer);
         _consumer = _consumerSupplier.get();
     }
 
     @Override
     public void close() {
-        IOUtil.closeQuietly(_consumer);
+        closeQuietly(_consumer);
     }
+
+    public static void closeQuietly(AutoCloseable closeable) {
+        if (closeable != null) {
+            try {
+                closeable.close();
+            } catch (Exception e) {
+                // Log l'erreur ou ignorer silencieusement
+            }
+        }
+    }
+
 }
