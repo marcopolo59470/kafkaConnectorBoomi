@@ -1,16 +1,23 @@
 package com.boomi.connector.kafka.client.consumer;
 
+import com.boomi.connector.api.ConnectorException;
 import com.boomi.connector.kafka.operation.commit.Committable;
+import com.boomi.connector.kafka.operation.produce.SSLCredentials;
+import com.boomi.connector.kafka.util.Constants;
 import com.boomi.util.CollectionUtil;
 
 
+import org.apache.kafka.clients.CommonClientConfigs;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.clients.consumer.OffsetCommitCallback;
+import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.KafkaException;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.config.SslConfigs;
 
 import java.util.Map;
 import java.util.Set;
@@ -21,6 +28,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Properties;
 import java.util.regex.Pattern;
+
+import static com.boomi.connector.kafka.util.Tools.translateEscapes;
 
 /**
  * An extension of {@link KafkaConsumer} with custom method overloads.
@@ -38,10 +47,40 @@ public class BoomiCustomConsumer implements AutoCloseable { // Implémentation d
     public BoomiCustomConsumer(ConsumerConfiguration configuration) {
         // Build properties from ConsumerConfiguration
         Properties props = new Properties();
+
         props.putAll(configuration.getConfig().originals());
+
         props.put("client.id", configuration.getClientId());
         props.put("max.partition.fetch.bytes", configuration.getMaxRequestSize());
 
+        // Initialize KafkaConsumer
+        this.kafkaConsumer = new KafkaConsumer<>(props);
+    }
+
+    /**
+     * Constructor to initialize KafkaConsumer for the committern.
+     *
+     * @param configuration the consumer configuration.
+     */
+    public BoomiCustomConsumer(ConsumerConfiguration configuration, SSLCredentials sslCredentials, String groupeId) {
+        // Build properties from ConsumerConfiguration
+        Properties props = new Properties();
+
+        props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL");
+        props.put(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG,"PEM");
+        props.put(SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG,"PEM");
+        props.put(CommonClientConfigs.RETRIES_CONFIG, 0);
+        props.put(SslConfigs.SSL_KEYSTORE_KEY_CONFIG, translateEscapes(sslCredentials.getAccessKey()));
+        props.put(SslConfigs.SSL_KEYSTORE_CERTIFICATE_CHAIN_CONFIG, translateEscapes(sslCredentials.getAccessCertificate()));
+        props.put(SslConfigs.SSL_TRUSTSTORE_CERTIFICATES_CONFIG, translateEscapes(sslCredentials.getCACertificate()));
+        props.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, translateEscapes(sslCredentials.getBootstrapServer()));
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, groupeId);
+
+        props.put("client.id", configuration.getClientId());
+        props.put("max.partition.fetch.bytes", configuration.getMaxRequestSize());
+        props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+    //throw new ConnectorException(sslCredentials.getAccessKey() + sslCredentials.getAccessCertificate() + sslCredentials.getCACertificate() + sslCredentials.getBootstrapServer());
         // Initialize KafkaConsumer
         this.kafkaConsumer = new KafkaConsumer<>(props);
     }

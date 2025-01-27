@@ -90,8 +90,8 @@ public class KafkaOperationConnection extends KafkaConnection<OperationContext> 
         return BoomiCustomConsumerSupplierFactory.createSupplierRegex(ConsumerConfiguration.consumer(this), regex);
     }
 
-    public BoomiCommitter createCommitter() {
-        return new BoomiCommitter(ConsumerConfiguration.consumer(this));
+    public BoomiCommitter createCommitter(SSLCredentials sslCredentials, String groupeId) {
+        return new BoomiCommitter(ConsumerConfiguration.consumer(this), sslCredentials, groupeId);
     }
 
     @Override

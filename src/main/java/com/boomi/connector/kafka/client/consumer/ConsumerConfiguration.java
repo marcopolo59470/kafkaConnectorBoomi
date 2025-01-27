@@ -20,9 +20,11 @@ import io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import org.apache.kafka.clients.CommonClientConfigs;
+import org.apache.kafka.clients.GroupRebalanceConfig;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.config.SslConfigs;
+import org.apache.kafka.common.config.internals.BrokerSecurityConfigs;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 
@@ -82,11 +84,14 @@ public class ConsumerConfiguration extends KafkaConfiguration<ConsumerConfig> {
         putConfig(SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG,"PEM");
         putConfig(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG,"PEM");
         //key
-        putConfig(SslConfigs.SSL_KEYSTORE_KEY_CONFIG, translateEscapes(connection.getContext().getOperationProperties().getProperty(Constants.ACCESS_KEY)));
+        String key = connection.getContext().getConnectionProperties().getProperty(Constants.ACCESS_KEY, connection.getContext().getOperationProperties().getProperty(Constants.ACCESS_KEY));
+        String cert = connection.getContext().getConnectionProperties().getProperty(Constants.ACCESS_CERT, connection.getContext().getOperationProperties().getProperty(Constants.ACCESS_CERT));
+        String pem = connection.getContext().getConnectionProperties().getProperty(Constants.CA_CERTIFICATE, connection.getContext().getOperationProperties().getProperty(Constants.CA_CERTIFICATE));
+        putConfig(SslConfigs.SSL_KEYSTORE_KEY_CONFIG, translateEscapes(key));
         //cert
-        putConfig(SslConfigs.SSL_KEYSTORE_CERTIFICATE_CHAIN_CONFIG, translateEscapes(connection.getContext().getOperationProperties().getProperty(Constants.ACCESS_CERT)));
+        putConfig(SslConfigs.SSL_KEYSTORE_CERTIFICATE_CHAIN_CONFIG, translateEscapes(cert));
         //pem
-        putConfig(SslConfigs.SSL_TRUSTSTORE_CERTIFICATES_CONFIG, translateEscapes(connection.getContext().getOperationProperties().getProperty(Constants.CA_CERTIFICATE)));
+        putConfig(SslConfigs.SSL_TRUSTSTORE_CERTIFICATES_CONFIG, translateEscapes(pem));
 
         if (connection.getContext().getOperationProperties().getBooleanProperty(Constants.KEY_IS_REGEX_TOPIC, false)) {
             putConfig(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG, "org.apache.kafka.clients.consumer.CooperativeStickyAssignor");

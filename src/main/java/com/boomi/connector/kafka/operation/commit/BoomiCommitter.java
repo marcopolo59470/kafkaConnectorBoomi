@@ -1,7 +1,9 @@
 package com.boomi.connector.kafka.operation.commit;
 
+import com.boomi.connector.api.ConnectorException;
 import com.boomi.connector.kafka.client.consumer.BoomiCustomConsumer;
 import com.boomi.connector.kafka.client.consumer.ConsumerConfiguration;
+import com.boomi.connector.kafka.operation.produce.SSLCredentials;
 
 import java.io.Closeable;
 
@@ -9,8 +11,9 @@ public class BoomiCommitter implements Closeable {
 
     private final BoomiCustomConsumer _committer;
 
-    public BoomiCommitter(ConsumerConfiguration boomiConfiguration) {
-        _committer = new BoomiCustomConsumer(boomiConfiguration);
+    public BoomiCommitter(ConsumerConfiguration boomiConfiguration, SSLCredentials sslCredentials, String groupeId) {
+        _committer = new BoomiCustomConsumer(boomiConfiguration, sslCredentials, groupeId);
+
     }
 
     /**

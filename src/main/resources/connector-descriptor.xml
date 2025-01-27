@@ -36,12 +36,6 @@
             <value>SASL_SSL</value>
         </allowedValue>
     </field>
-
-    <field id="bootstrap_servers" label="Bootstrap Server" type="string">
-        <helpText>
-            Enter a list of host and port pairs, separated by commas.
-        </helpText>
-    </field>
     <field id="service_principal" label="Service Name/Principal" type="string">
         <helpText>
             A unique identifier for the service instance accessing the Kerberos account. The instance is typically
@@ -95,7 +89,6 @@
     </field>
     <field id="oauth_client_id" label="OAuth Client ID" type="string">
         <helpText>Enter the OAuth Client ID for this instance</helpText>
-        <defaultValue></defaultValue>
         <visibilityCondition>
             <valueCondition fieldId="sasl_mechanism">
                 <value>OAUTHBEARER</value>
@@ -112,16 +105,11 @@
     </field>
     <field id="oauth_scope" label="Scope" type="string">
         <helpText>Enter the scope for enabling specific role based access</helpText>
-        <defaultValue></defaultValue>       
         <visibilityCondition>
             <valueCondition fieldId="sasl_mechanism">
                 <value>OAUTHBEARER</value>
             </valueCondition>
         </visibilityCondition>
-    </field>
-
-    <field id="private_certificate" label="Certificate" type="privatecertificate">
-        <helpText>Select a private certificate component for SSL client authentication. Used only if operation keys/certificates are empty</helpText>
     </field>
 
     <field id="polling_interval" label="Polling Interval" type="integer">
@@ -150,17 +138,6 @@
             </helpText>
         </field>
 
-        <field id="basic.auth.user.info" label="Basic Auth" type="password">
-            <helpText>
-                https://docs.confluent.io/platform/current/schema-registry/connect.html#configuration-options
-            </helpText>
-        </field>
-        <field id="basic.auth.credentials.source" label="Basic SOurce" type="string">
-            <helpText>
-                https://docs.confluent.io/platform/current/schema-registry/connect.html#configuration-options
-            </helpText>
-            <defaultValue>USER_INFO</defaultValue>
-        </field>
         <field id="access.key" label="Access Key" type="password">
             <helpText>The .key file from ATM</helpText>
         </field>
@@ -190,6 +167,28 @@
         <field id="schema.registry.url" label="Schema registry URL" type="string">
             <helpText>
                 Enter the schema registry url.
+            </helpText>
+            <visibilityCondition>
+                <valueCondition fieldId="avro.mode">
+                    <value>1</value>
+                    <value>2</value>
+                </valueCondition>
+            </visibilityCondition>
+        </field>
+        <field id="basic.auth.user.info" label="Basic Auth" type="password">
+            <helpText>
+                https://docs.confluent.io/platform/current/schema-registry/connect.html#configuration-options
+            </helpText>
+            <visibilityCondition>
+                <valueCondition fieldId="avro.mode">
+                    <value>1</value>
+                    <value>2</value>
+                </valueCondition>
+            </visibilityCondition>
+        </field>
+        <field id="basic.auth.credentials.source" label="Basic Source" type="string">
+            <helpText>
+                should be USER_INFO by default
             </helpText>
             <visibilityCondition>
                 <valueCondition fieldId="avro.mode">
@@ -395,17 +394,6 @@
                 associated with the Kafka connector.
             </helpText>
         </field>
-        <field id="basic.auth.user.info" label="basic.auth.user.info" type="password" overrideable="true">
-            <helpText>
-                https://docs.confluent.io/platform/current/schema-registry/connect.html#configuration-options
-            </helpText>
-        </field>
-        <field id="basic.auth.credentials.source" label="basic.auth.credentials.source" type="string">
-            <helpText>
-                https://docs.confluent.io/platform/current/schema-registry/connect.html#configuration-options
-            </helpText>
-            <defaultValue>USER_INFO</defaultValue>
-        </field>
         <field id="access.key" label="Access Key" type="password" overrideable="true">
             <helpText>The .key file from ATM</helpText>
         </field>
@@ -441,6 +429,29 @@
                     <value>2</value>
                 </valueCondition>
             </visibilityCondition>
+        </field>
+        <field id="basic.auth.user.info" label="Basic Auth" type="password">
+            <helpText>
+                https://docs.confluent.io/platform/current/schema-registry/connect.html#configuration-options
+            </helpText>
+            <visibilityCondition>
+                <valueCondition fieldId="avro.mode">
+                    <value>1</value>
+                    <value>2</value>
+                </valueCondition>
+            </visibilityCondition>
+        </field>
+        <field id="basic.auth.credentials.source" label="Basic Source" type="string">
+            <helpText>
+                should be USER_INFO by default
+            </helpText>
+            <visibilityCondition>
+                <valueCondition fieldId="avro.mode">
+                    <value>1</value>
+                    <value>2</value>
+                </valueCondition>
+            </visibilityCondition>
+
         </field>
         <field id="consumer_group" label="Consumer Group" type="string">
             <helpText>
@@ -551,7 +562,18 @@
                 associated with the Kafka connector.
             </helpText>
         </field>
-
+        <field id="access.key" label="Access Key" type="password" overrideable="true">
+            <helpText>The .key file from ATM</helpText>
+        </field>
+        <field id="access.cert" label="Access Certificate" type="password" overrideable="true">
+            <helpText>The .cert file from ATM</helpText>
+        </field>
+        <field id="ca.certificate" label="CA Certificate" type="password" overrideable="true">
+            <helpText>The .pem file from ATM</helpText>
+        </field>
+        <field id="bootstrap.server" label="Bootstrap Server" type="string" overrideable="true">
+            <helpText>https://kafka.apache.org/documentation/#streamsconfigs_bootstrap.servers</helpText>
+        </field>
         <field id="consumer_group" label="Consumer Group" type="string">
             <helpText>
                 Enter the unique string that identifies the consumer group which the connector belongs to.
@@ -587,17 +609,6 @@
                 associated with the Kafka connector.
             </helpText>
         </field>
-        <field id="basic.auth.user.info" label="Basic Auth" type="password" overrideable="true">
-            <helpText>
-                https://docs.confluent.io/platform/current/schema-registry/connect.html#configuration-options
-            </helpText>
-        </field>
-        <field id="basic.auth.credentials.source" label="Basic Source" type="string">
-            <helpText>
-                https://docs.confluent.io/platform/current/schema-registry/connect.html#configuration-options
-            </helpText>
-            <defaultValue>USER_INFO</defaultValue>
-        </field>
         <field id="access.key" label="Access Key" type="password" overrideable="true">
             <helpText>The .key file from ATM</helpText>
         </field>
@@ -626,6 +637,28 @@
         <field id="schema.registry.url" label="Schema registry URL" type="string">
             <helpText>
                 Enter the schema registry url.
+            </helpText>
+            <visibilityCondition>
+                <valueCondition fieldId="avro.mode">
+                    <value>1</value>
+                    <value>2</value>
+                </valueCondition>
+            </visibilityCondition>
+        </field>
+        <field id="basic.auth.user.info" label="Basic Auth" type="password">
+            <helpText>
+                https://docs.confluent.io/platform/current/schema-registry/connect.html#configuration-options
+            </helpText>
+            <visibilityCondition>
+                <valueCondition fieldId="avro.mode">
+                    <value>1</value>
+                    <value>2</value>
+                </valueCondition>
+            </visibilityCondition>
+        </field>
+        <field id="basic.auth.credentials.source" label="Basic SOurce" type="string">
+            <helpText>
+                should be USER_INFO by default
             </helpText>
             <visibilityCondition>
                 <valueCondition fieldId="avro.mode">

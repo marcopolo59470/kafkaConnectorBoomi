@@ -1,6 +1,7 @@
 package com.boomi.connector.kafka.configuration;
 
 import com.boomi.connector.api.ConnectorContext;
+import com.boomi.connector.api.ConnectorException;
 import com.boomi.connector.kafka.KafkaConnection;
 import com.boomi.connector.kafka.client.common.kerberos.KerberosTicketCache;
 import com.boomi.connector.kafka.client.common.kerberos.KerberosTicketKey;
@@ -38,8 +39,8 @@ public abstract class KafkaConfiguration<T extends AbstractConfig> implements Co
 
     protected static final int DEFAULT_TIMEOUT = 30 * 1000;
 
-    private static final int DEFAULT_SESSION_TIMEOUT = 120000;
-    private static final int DEFAULT_INTERVAL_HEARTBEAT = 50000;
+    private static final int DEFAULT_SESSION_TIMEOUT = 70000;
+    private static final int DEFAULT_INTERVAL_HEARTBEAT = 30000;
 
     private final Map<String, Object> _configs;
     private final Credentials _credentials;
@@ -82,8 +83,9 @@ public abstract class KafkaConfiguration<T extends AbstractConfig> implements Co
 
 
     private static Map<String, Object> buildBaseConfiguration(String bootstrapServers) {
+
         Map<String, Object> configs = new HashMap<>();
-        configs.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        //configs.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         // setting max inflight request to 1 as we are not supporting multithreading
         configs.put(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, 1);
         // disable retries

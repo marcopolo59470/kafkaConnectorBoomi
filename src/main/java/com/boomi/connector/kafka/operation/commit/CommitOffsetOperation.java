@@ -6,6 +6,7 @@ import com.boomi.connector.api.OperationResponse;
 import com.boomi.connector.api.ResponseUtil;
 import com.boomi.connector.api.UpdateRequest;
 import com.boomi.connector.kafka.operation.KafkaOperationConnection;
+import com.boomi.connector.kafka.operation.produce.SSLCredentials;
 import com.boomi.connector.kafka.util.Constants;
 import com.boomi.connector.kafka.util.ResultUtil;
 import com.boomi.connector.kafka.util.TopicNameUtil;
@@ -112,7 +113,17 @@ public class CommitOffsetOperation extends BaseUpdateOperation {
         BoomiCommitter committer = null;
 
         try {
-            committer = getConnection().createCommitter();
+            var config = getConnection().getContext().getOperationProperties();
+
+            SSLCredentials sslCredentials = new SSLCredentials(
+                    config.getProperty("EMPTY"),
+                    config.getProperty(Constants.ACCESS_KEY),
+                    config.getProperty(Constants.ACCESS_CERT),
+                    config.getProperty(Constants.CA_CERTIFICATE),
+                    config.getProperty(Constants.BOOTSTRAP_SERVER),
+                    config.getProperty("EMPTY")
+            );
+            committer = getConnection().createCommitter(sslCredentials, config.getProperty(Constants.KEY_CONSUMER_GROUP));
 
             Collection<CommitBatch> batches = buildBatches(request, response);
 

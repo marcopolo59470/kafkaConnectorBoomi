@@ -51,8 +51,6 @@ public class ProducerConfiguration extends KafkaConfiguration<ProducerConfig> {
         putConfig(ProducerConfig.MAX_BLOCK_MS_CONFIG, _maxWaitTimeout);
         putConfig(ProducerConfig.ACKS_CONFIG, properties.getProperty(Constants.KEY_ACKS));
         putConfig(ProducerConfig.COMPRESSION_TYPE_CONFIG, properties.getProperty(Constants.KEY_COMPRESSION_TYPE));
-        putConfig(AbstractKafkaSchemaSerDeConfig.KEY_SUBJECT_NAME_STRATEGY, properties.getProperty(Constants.KEY_SUBJECT_NAME_STRATEGY));
-        putConfig(AbstractKafkaSchemaSerDeConfig.VALUE_SUBJECT_NAME_STRATEGY, properties.getProperty(Constants.VALUE_SUBJECT_NAME_STRATEGY));
 
         //Authentification
         putConfig(SchemaRegistryClientConfig.USER_INFO_CONFIG, getDynamicIfPresent(
@@ -63,7 +61,6 @@ public class ProducerConfiguration extends KafkaConfiguration<ProducerConfig> {
         putConfig(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL");
         putConfig(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG,"PEM");
         putConfig(SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG,"PEM");
-
 
         //key
         putConfig(SslConfigs.SSL_KEYSTORE_KEY_CONFIG, getDynamicIfPresent(
@@ -80,10 +77,14 @@ public class ProducerConfiguration extends KafkaConfiguration<ProducerConfig> {
             putConfig("schema.registry.url", getDynamicIfPresent(dynamicProperties.getSchemaUrl(), properties.getProperty(Constants.SCHEMA_REGISTRY_URL)));
             putConfig(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getTypeName());
             putConfig(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getTypeName());
+            putConfig(AbstractKafkaSchemaSerDeConfig.KEY_SUBJECT_NAME_STRATEGY, properties.getProperty(Constants.KEY_SUBJECT_NAME_STRATEGY));
+            putConfig(AbstractKafkaSchemaSerDeConfig.VALUE_SUBJECT_NAME_STRATEGY, properties.getProperty(Constants.VALUE_SUBJECT_NAME_STRATEGY));
         } else if (Objects.equals(_avroType, "1")) {
             putConfig("schema.registry.url", getDynamicIfPresent(dynamicProperties.getSchemaUrl(), properties.getProperty(Constants.SCHEMA_REGISTRY_URL)));
             putConfig(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getTypeName());
             putConfig(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getTypeName());
+            putConfig(AbstractKafkaSchemaSerDeConfig.KEY_SUBJECT_NAME_STRATEGY, "io.confluent.kafka.serializers.subject.TopicNameStrategy");
+            putConfig(AbstractKafkaSchemaSerDeConfig.VALUE_SUBJECT_NAME_STRATEGY, properties.getProperty(Constants.VALUE_SUBJECT_NAME_STRATEGY));
         } else {
             putConfig(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getTypeName());
             putConfig(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, InputStreamSerializer.class.getTypeName());

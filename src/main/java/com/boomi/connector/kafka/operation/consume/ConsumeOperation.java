@@ -15,6 +15,7 @@ import com.boomi.util.IOUtil;
 
 import org.apache.kafka.common.network.InvalidReceiveException;
 
+import java.util.Map;
 import java.util.logging.Level;
 
 /**
@@ -62,9 +63,17 @@ public class ConsumeOperation extends BaseUpdateOperation {
 
     @Override
     protected void executeUpdate(UpdateRequest request, OperationResponse response) {
-
         ConsumeResponseHandler responseHandler = new ConsumeResponseHandler(request, response);
-        String dynamicRegexTopicValue = request.iterator().next().getDynamicProperties().get(Constants.KEY_REGEX_TOPIC_VALUE);
+
+        String dynamicRegexTopicValue = null;
+
+       if (request.iterator().hasNext()) {
+            Map<String, String> dynamicProperties = request.iterator().next().getDynamicProperties();
+            if (dynamicProperties.containsKey(Constants.KEY_REGEX_TOPIC_VALUE)) {
+                dynamicRegexTopicValue = dynamicProperties.get(Constants.KEY_REGEX_TOPIC_VALUE);
+            }
+        }
+
         BoomiConsumer consumer = null;
         try {
             consumer = getConnection().createConsumer(dynamicRegexTopicValue, _topic);
